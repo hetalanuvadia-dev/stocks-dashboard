@@ -1,0 +1,55 @@
+name: Weekly index membership refresh
+
+# Keeps point-in-time Nifty index membership current. The semi-annual reshuffle is end-March /
+# end-September, plus interim changes; NSE publishes each as a press release. build_changelog.py
+# now AUTO-DISCOVERS recent press releases, and build_membership_v2.py re-anchors from today's
+# official list + the changelog. Running weekly means a new reshuffle is reflected within days
+# instead of silently lagging (the failure that mis-dated the March-2026 reshuffle).
+
+on:
+  schedule:
+    - cron: "30 16 * * 6"   # Saturday 22:00 IST
+  workflow_dispatch: {}
+  push:
+    paths:
+      - "scripts/build_changelog.py"
+      - "scripts/build_membership_v2.py"
+      - ".github/workflows/refresh-membership.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-membership
+  cancel-in-progress: false
+
+jobs:
+  refresh-membership:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install pypdf
+
+      - name: Refresh changelog from NSE press releases (auto-discovers new ones)
+        run: python3 scripts/build_changelog.py || echo "changelog refresh failed — keeping committed copy"
+
+      - name: Rebuild point-in-time membership (validates vs official archives)
+        run: python3 scripts/build_membership_v2.py
+
+      - name: Commit if membership changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/indices_history.json scripts/_changelog.json docs/stock_data.bin
+          if git diff --cached --quiet; then echo "membership unchanged"; exit 0; fi
+          git commit -m "Weekly membership refresh $(TZ=Asia/Kolkata date +'%Y-%m-%d')"
+          for i in 1 2 3; do
+            if git push origin HEAD:main; then echo "pushed"; exit 0; fi
+            git fetch origin main && git rebase origin/main || true
+          done
+          echo "push failed after retries"; exit 1

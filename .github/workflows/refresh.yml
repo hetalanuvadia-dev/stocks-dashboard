@@ -1,0 +1,104 @@
+name: Daily stock data refresh
+
+on:
+  schedule:
+    # GitHub's own cron is best-effort and skips occasionally. We keep these
+    # as a fallback (16:00 / 16:30 / 17:00 IST weekdays), but the primary
+    # trigger now comes from an external scheduler (cron-job.org or similar)
+    # via the `repository_dispatch` event below.
+    - cron: "30 10 * * 1-5"
+    - cron: "0  11 * * 1-5"
+    - cron: "30 11 * * 1-5"
+  # External scheduler hits  POST /repos/{owner}/{repo}/dispatches
+  # with header `Authorization: Bearer <PAT>` and body
+  # `{"event_type":"scheduled-refresh"}` — guaranteed delivery, no GitHub-cron
+  # luck involved.
+  repository_dispatch:
+    types: [scheduled-refresh]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# Only one refresh run at a time, but later triggers WAIT for in-flight runs
+# instead of cancelling them. This way the 16:00 IST cron (which may catch
+# partial Yahoo data) completes and commits, then 16:30 / 17:00 runs queue
+# and re-fetch in case the earlier one missed today's full close set.
+concurrency:
+  group: refresh-main
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download NSE + BSE scrip lists
+        run: |
+          curl -s -A "Mozilla/5.0" \
+               "https://archives.nseindia.com/content/equities/EQUITY_L.csv" \
+               -o /tmp/nse.csv
+          curl -s -A "Mozilla/5.0" \
+               -H "Referer: https://www.bseindia.com/" \
+               "https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?Group=&Scripcode=&industry=&segment=Equity&status=Active" \
+               -o /tmp/bse.json
+          wc -l /tmp/nse.csv
+          ls -la /tmp/bse.json
+
+      - name: Fetch price history from Yahoo Finance
+        run: python3 scripts/fetch_all.py
+
+      - name: Fetch sector metadata from BSE
+        run: python3 scripts/fetch_sectors.py
+
+      - name: Build dashboard HTML
+        run: python3 scripts/build_compressed.py
+
+      - name: Commit updated dashboard
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Save the newly built dashboard outside the working tree first.
+          # We use a "reset-and-replay" strategy on push conflicts: pull latest
+          # main, drop our new dashboard on top (overwrite, no merge), commit,
+          # push. Avoids content-merge conflicts on the binary-ish HTML.
+          cp docs/nse-bse-dashboard.html /tmp/new_dashboard.html
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/new_dashboard.html docs/nse-bse-dashboard.html
+            git add docs/nse-bse-dashboard.html
+
+            if git diff --cached --quiet; then
+              echo "Remote already has identical dashboard — nothing to commit"
+              exit 0
+            fi
+
+            git commit -m "Daily refresh $(TZ=Asia/Kolkata date +'%Y-%m-%d %H:%M IST')"
+            if git push origin HEAD:main; then
+              echo "Pushed on attempt #$attempt"
+              exit 0
+            fi
+            echo "Push attempt #$attempt rejected; resetting and retrying"
+            sleep $(( attempt * 3 ))
+          done
+          echo "Failed to push after 5 attempts"
+          exit 1
+
+      - name: Upload raw data as artifact (optional, 7-day retention)
+        uses: actions/upload-artifact@v4
+        with:
+          name: stock_data
+          path: scripts/stock_data.json
+          retention-days: 7
+          if-no-files-found: ignore

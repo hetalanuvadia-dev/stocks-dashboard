@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STOCKSWORLD · Backtest History</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="./theme.css" />
+<script src="./theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./bt-sync.js"></script>
+<style>
+  body{font-feature-settings:"tnum" 1}
+  .pos{color:#15803d;font-weight:600}.neg{color:#b91c1c;font-weight:600}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:.75rem}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+  <div class="max-w-screen-xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <a href="./nse-bse-dashboard.html" class="flex items-center gap-2.5 shrink-0 group">
+      <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-center font-extrabold text-[13px] shadow-md group-hover:scale-105 transition">SW</span>
+      <span class="font-bold text-slate-900 tracking-tight hidden sm:block">STOCKS<span class="text-indigo-600">WORLD</span></span>
+    </a>
+    <nav class="flex items-center gap-1 overflow-x-auto">
+      <a href="./nse-bse-dashboard.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">📈<span class="hidden sm:inline">Stocks</span></a>
+      <a href="./stock-backtest.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow transition">🧪<span class="hidden sm:inline">Backtest</span></a>
+      <a href="./saved-strategies.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">⭐<span class="hidden sm:inline">Strategies</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-4 py-6">
+  <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+    <h1 class="text-xl md:text-2xl font-bold text-slate-900">📜 Backtest History</h1>
+    <button id="clearAll" class="text-xs text-red-600 hover:underline font-semibold">Clear all</button>
+  </div>
+  <p class="text-xs text-slate-500 mb-4">Shared backtest history — anyone can <b>run a backtest to add one</b>. Click <b>Load</b> to re-open &amp; re-run a setup. <a href="./stock-backtest.html" class="text-indigo-600 hover:underline">← back to Backtest</a></p>
+  <div id="list"></div>
+</main>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+function load(){try{return JSON.parse(localStorage.getItem('bt_history')||'[]');}catch(e){return[];}}
+function save(v){localStorage.setItem('bt_history',JSON.stringify(v)); if(window.btSync)btSync.push();}
+const fmtINR=n=>n==null?'—':'₹'+Math.round(n).toLocaleString('en-IN');
+const pct=n=>n==null?'—':(n>=0?'+':'')+n.toFixed(2)+'%';
+const fdate=ts=>{const d=new Date(ts);return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};
+
+function render(){
+  const items=load();
+  if(!items.length){ $('list').innerHTML='<div class="card p-8 text-center text-slate-400 text-sm">No backtests yet.</div>'; return; }
+  $('list').innerHTML=`<div class="card overflow-x-auto"><table class="w-full text-sm">
+    <thead class="text-[11px] uppercase text-slate-500 border-b border-slate-200"><tr>
+      <th class="text-left py-2 px-3">Saved</th><th class="text-left px-3">Strategy</th><th class="text-left px-3">Period</th>
+      <th class="text-right px-3">CAGR</th><th class="text-right px-3">vs Nifty</th><th class="text-right px-3">Max DD</th><th class="text-right px-3">Final ₹1L</th><th class="px-3"></th></tr></thead>
+    <tbody>${items.map(it=>{const m=it.m,c=it.cfg,beat=m.benchCagr!=null&&m.cagr>=m.benchCagr;const hasY=it.yby&&it.yby.length;
+      return `<tr class="border-b border-slate-50 hover:bg-slate-50 ${hasY?'cursor-pointer':''}" ${hasY?`data-exp="${it.id}"`:''}>
+        <td class="px-3 py-2 text-xs text-slate-500 whitespace-nowrap">${hasY?'<span class="exparrow inline-block w-3 text-slate-400">▸</span> ':'<span class="inline-block w-3"></span> '}${fdate(it.ts)}</td>
+        <td class="px-3 font-medium">${it.label||''}</td>
+        <td class="px-3 text-xs text-slate-500 whitespace-nowrap">${c.start} → ${c.end}</td>
+        <td class="text-right px-3 ${m.cagr>=0?'pos':'neg'}">${pct(m.cagr)}</td>
+        <td class="text-right px-3 text-xs ${beat?'pos':'neg'}">${m.benchCagr!=null?pct(m.benchCagr):'—'}</td>
+        <td class="text-right px-3 neg">-${m.maxDD.toFixed(2)}%</td>
+        <td class="text-right px-3">${fmtINR(m.finalV)}</td>
+        <td class="px-3 whitespace-nowrap text-right">
+          <button class="text-blue-600 hover:underline text-xs font-semibold" data-load="${it.id}">Load</button>
+          ${OWNER?`<button class="text-red-500 hover:underline text-xs ml-2" data-del="${it.id}">Delete</button>`:''}</td></tr>${hasY?`
+      <tr id="exp_${it.id}" style="display:none"><td colspan="8" class="px-3 pb-3 bg-slate-50">
+        <div class="text-[11px] uppercase text-slate-500 mb-1 pt-1">📅 Calendar-year returns — strategy vs Nifty</div>
+        <div class="overflow-x-auto"><table class="text-xs"><thead><tr><th class="px-2 text-left"></th>${it.yby.map(y=>`<th class="px-2 py-0.5 text-right">${y[0]}</th>`).join('')}</tr></thead><tbody>
+          <tr><td class="px-2 text-blue-700 font-semibold whitespace-nowrap">Strategy</td>${it.yby.map(y=>`<td class="px-2 text-right ${y[1]>=0?'pos':'neg'}">${pct(y[1])}</td>`).join('')}</tr>
+          <tr><td class="px-2 text-amber-600 font-semibold whitespace-nowrap">Nifty 500</td>${it.yby.map(y=>`<td class="px-2 text-right ${y[2]>=0?'pos':'neg'}">${y[2]!=null?pct(y[2]):'—'}</td>`).join('')}</tr>
+        </tbody></table></div></td></tr>`:''}`;}).join('')}
+    </tbody></table></div>`;
+  $('list').querySelectorAll('[data-exp]').forEach(row=>row.addEventListener('click',e=>{ if(e.target.closest('button'))return; const d=$('exp_'+row.dataset.exp); if(!d)return; const open=d.style.display==='none'; d.style.display=open?'table-row':'none'; const ar=row.querySelector('.exparrow'); if(ar)ar.textContent=open?'▾':'▸'; }));
+  $('list').querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{const it=load().find(x=>x.id===b.dataset.load); if(it){localStorage.setItem('bt_load',JSON.stringify(it.cfg)); location.href='./stock-backtest.html';}});
+  $('list').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{save(load().filter(x=>x.id!==b.dataset.del)); render();});
+}
+const OWNER = !!(window.btSync && btSync.isOwner());
+if($('clearAll') && !OWNER) $('clearAll').style.display='none';   // visitors can add, but not erase via the UI
+$('clearAll').onclick=()=>{ if(confirm('Clear the ENTIRE shared history for everyone?')){ save([]); render(); } };
+
+// auto-load the shared history (everyone), then render
+(async()=>{ if(window.btSync){ try{ await btSync.pull(); }catch(e){} } render(); })();
+</script>
+</body>
+</html>

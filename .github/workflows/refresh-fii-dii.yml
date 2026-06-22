@@ -1,0 +1,74 @@
+name: Daily FII/DII refresh
+
+on:
+  schedule:
+    # 14:45 UTC = 20:15 IST, weekdays — after NSE publishes provisional cash
+    # FII/DII (~19:00 IST). GitHub cron is best-effort; the data also self-heals
+    # on the next run since the history file only grows.
+    - cron: "45 14 * * 1-5"
+  # Optional external trigger (cron-job.org) — SEPARATE event type from the
+  # stock ("scheduled-refresh") and MF ("mf-refresh") jobs so all three are
+  # independent. POST /repos/dhruvan246/stocks-dashboard/dispatches with
+  #   {"event_type":"fii-dii-refresh"}
+  repository_dispatch:
+    types: [fii-dii-refresh]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-fii-dii
+  cancel-in-progress: false
+
+jobs:
+  refresh-fii-dii:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps (xlrd reads NSE's FII derivative-stats .xls)
+        run: pip install xlrd==2.0.1
+
+      - name: Fetch latest FII/DII activity
+        run: python3 scripts/fetch_fii_dii.py
+
+      - name: Commit updated FII/DII history
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p /tmp/fd/docs
+          cp docs/fii_dii.json docs/fii_fo.json docs/nifty.json docs/nifty500.json /tmp/fd/docs/
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/fd/docs/fii_dii.json docs/fii_dii.json
+            cp /tmp/fd/docs/fii_fo.json  docs/fii_fo.json
+            cp /tmp/fd/docs/nifty.json   docs/nifty.json
+            cp /tmp/fd/docs/nifty500.json docs/nifty500.json
+            git add docs/fii_dii.json docs/fii_fo.json docs/nifty.json docs/nifty500.json
+
+            if git diff --cached --quiet; then
+              echo "No new FII/DII data — nothing to commit"
+              exit 0
+            fi
+
+            git commit -m "Daily FII/DII refresh $(TZ=Asia/Kolkata date +'%Y-%m-%d %H:%M IST')"
+            if git push origin HEAD:main; then
+              echo "Pushed on attempt #$attempt"
+              exit 0
+            fi
+            echo "Push attempt #$attempt rejected; resetting and retrying"
+            sleep $(( attempt * 3 ))
+          done
+          echo "Failed to push after 5 attempts"
+          exit 1

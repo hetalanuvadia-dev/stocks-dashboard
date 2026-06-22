@@ -1,0 +1,274 @@
+/* =============================================================================
+ * STOCKSWORLD — shared theme (Light / Dark / Soft)
+ *
+ * Loaded on every page alongside the Tailwind CDN. Strategy:
+ *   1. Each theme defines a set of CSS-variable TOKENS (--surface, --text, …).
+ *   2. The neutral Tailwind classes the pages already use (bg-white, bg-slate-50,
+ *      text-slate-*, border-slate-*, hover:bg-slate-*) are re-routed onto those
+ *      tokens — so switching theme transforms the existing markup with no HTML
+ *      changes. Dark also brightens the accent colours so nothing goes muddy.
+ *   3. theme.js sets <html data-theme="…"> before first paint (no flash) and
+ *      injects the header pill.
+ * Selectors use html[data-theme] for specificity so they win over Tailwind
+ * without fighting load order; the remap layer uses !important on purpose.
+ * ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+  --tr: .18s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* ----------------------------- LIGHT (default) ---------------------------- */
+html[data-theme="light"]{
+  --app-bg:
+    radial-gradient(1100px 560px at 12% -12%, #e8edff 0%, transparent 55%),
+    radial-gradient(900px 520px at 112% -6%, #f3ecff 0%, transparent 52%),
+    #f6f8fc;
+  --surface:#ffffff;
+  --surface-2:#f5f8fd;
+  --surface-3:#eceff7;
+  --border:#e7eaf2;
+  --border-strong:#d6dbe8;
+  --text:#0f172a;
+  --text-muted:#586173;
+  --text-faint:#8b94a6;
+  --accent:#4f46e5; --accent-2:#7c3aed;
+  --accent-soft: rgba(79, 70, 229, .10);
+  --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 10px 26px -14px rgba(16, 24, 40, .22);
+  --shadow-lg: 0 16px 44px -18px rgba(16, 24, 40, .34);
+  --header-bg: rgba(255, 255, 255, .72);
+  --pos:#15803d; --neg:#b91c1c;
+  --glow: rgba(79, 70, 229, .45);
+}
+
+/* ------------------------- SOFT (light, pastel/warm) ---------------------- */
+html[data-theme="soft"]{
+  --app-bg:
+    radial-gradient(1000px 560px at 0% -6%, #ffe6f0 0%, transparent 50%),
+    radial-gradient(960px 560px at 102% -4%, #e3f7ee 0%, transparent 50%),
+    radial-gradient(880px 600px at 50% 118%, #ece8ff 0%, transparent 55%),
+    #fbf7f5;
+  --surface:#fffdfb;
+  --surface-2:#f9f1f5;
+  --surface-3:#f1eafa;
+  --border:#f0e3ec;
+  --border-strong:#e6d4e2;
+  --text:#3b2f44;
+  --text-muted:#776a7e;
+  --text-faint:#a597ac;
+  --accent:#db2777; --accent-2:#8b5cf6;
+  --accent-soft: rgba(219, 39, 119, .10);
+  --shadow: 0 2px 10px rgba(140, 90, 120, .08), 0 16px 42px -18px rgba(150, 90, 130, .30);
+  --shadow-lg: 0 20px 54px -18px rgba(150, 90, 130, .38);
+  --header-bg: rgba(255, 253, 251, .74);
+  --pos:#0f9d58; --neg:#e11d62;
+  --glow: rgba(219, 39, 119, .42);
+}
+
+/* -------------------------------- DARK ------------------------------------ */
+html[data-theme="dark"]{
+  --app-bg:
+    radial-gradient(1200px 680px at 8% -12%, #1a2150 0%, transparent 55%),
+    radial-gradient(1000px 620px at 114% -4%, #2a1b4d 0%, transparent 52%),
+    #0a0e19;
+  --surface:#131a2b;
+  --surface-2:#1a2236;
+  --surface-3:#232d45;
+  --border:#283350;
+  --border-strong:#384568;
+  --text:#e8ecf7;
+  --text-muted:#a4b0c8;
+  --text-faint:#6e7c98;
+  --accent:#818cf8; --accent-2:#a78bfa;
+  --accent-soft: rgba(129, 140, 248, .16);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .40), 0 14px 36px -16px rgba(0, 0, 0, .72);
+  --shadow-lg: 0 24px 64px -22px rgba(0, 0, 0, .82);
+  --header-bg: rgba(15, 20, 35, .68);
+  --pos:#34d399; --neg:#fb7185;
+  --glow: rgba(129, 140, 248, .55);
+}
+
+/* ------------------------------- base ------------------------------------- */
+html{ scroll-behavior:smooth; }
+html[data-theme] body{
+  font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--app-bg) !important;
+  background-attachment: fixed;
+  color: var(--text);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+html[data-theme] ::selection{ background:var(--accent-soft); }
+
+/* color transition so theme switches feel smooth (not on layout props) */
+html[data-theme] body, html[data-theme] .card, html[data-theme] header,
+html[data-theme] input, html[data-theme] select, html[data-theme] textarea, html[data-theme] button{
+  transition: background-color var(--tr), border-color var(--tr), color var(--tr), box-shadow var(--tr);
+}
+
+/* webkit scrollbar */
+html[data-theme] ::-webkit-scrollbar{ width:11px; height:11px; }
+html[data-theme] ::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:999px; border:3px solid transparent; background-clip:content-box; }
+html[data-theme] ::-webkit-scrollbar-thumb:hover{ background:var(--text-faint); background-clip:content-box; }
+
+/* ----------------------------- components --------------------------------- */
+html[data-theme] .card{
+  background: var(--surface) !important;
+  border:1px solid var(--border) !important;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+html[data-theme] .card:hover{ box-shadow: var(--shadow-lg); }
+
+html[data-theme] header{
+  background: var(--header-bg) !important;
+  -webkit-backdrop-filter: saturate(170%) blur(14px);
+  backdrop-filter: saturate(170%) blur(14px);
+  border-bottom:1px solid var(--border) !important;
+}
+
+/* inputs/selects pick up the theme surface (esp. important for dark) */
+html[data-theme] input, html[data-theme] select, html[data-theme] textarea{
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border-strong) !important;
+}
+html[data-theme] input::placeholder, html[data-theme] textarea::placeholder{ color:var(--text-faint) !important; }
+html[data-theme] input:focus, html[data-theme] select:focus, html[data-theme] textarea:focus{
+  outline:none; border-color:var(--accent) !important; box-shadow:0 0 0 3px var(--accent-soft) !important;
+}
+/* native date-picker icon is invisible on dark — invert it */
+html[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator{ filter: invert(1) brightness(1.6); opacity:.65; }
+
+/* primary / gradient buttons get a soft coloured glow + lift on all themes */
+html[data-theme] .bg-gradient-to-r, html[data-theme] .bg-gradient-to-br,
+html[data-theme] .bg-blue-600, html[data-theme] .bg-indigo-600,
+html[data-theme] .bg-emerald-600, html[data-theme] .bg-rose-600,
+html[data-theme] .bg-violet-600, html[data-theme] .bg-amber-600{
+  box-shadow: 0 8px 20px -8px var(--glow);
+}
+html[data-theme] button{ transition: transform var(--tr), box-shadow var(--tr), background-color var(--tr), color var(--tr); }
+html[data-theme] button:active{ transform: translateY(1px); }
+
+/* =========================================================================
+ * NEUTRAL REMAP LAYER — routes the Tailwind palette the pages use onto tokens.
+ * Applies to ALL themes (near-identity for Light; warm for Soft; inverted for
+ * Dark). NOTE: bg-slate-800/900 and text-white are intentionally NOT remapped
+ * — those are dark CTA buttons that must stay dark-with-white-text everywhere.
+ * ========================================================================= */
+html[data-theme] .bg-white{ background-color: var(--surface) !important; }
+html[data-theme] .bg-white\/90{ background-color: var(--header-bg) !important; }
+html[data-theme] .bg-slate-50{ background-color: var(--surface-2) !important; }
+html[data-theme] .bg-slate-50\/40{ background-color: color-mix(in srgb, var(--surface-2) 60%, transparent) !important; }
+html[data-theme] .bg-slate-100{ background-color: var(--surface-3) !important; }
+
+html[data-theme] .text-slate-900, html[data-theme] .text-slate-800, html[data-theme] .text-slate-700{ color: var(--text) !important; }
+html[data-theme] .text-slate-600, html[data-theme] .text-slate-500{ color: var(--text-muted) !important; }
+html[data-theme] .text-slate-400, html[data-theme] .text-slate-300{ color: var(--text-faint) !important; }
+
+html[data-theme] .border-slate-200, html[data-theme] .border-slate-100, html[data-theme] .border-slate-50{ border-color: var(--border) !important; }
+html[data-theme] .border-slate-300{ border-color: var(--border-strong) !important; }
+html[data-theme] .divide-slate-100 > :not([hidden]) ~ :not([hidden]){ border-color: var(--border) !important; }
+
+html[data-theme] .hover\:bg-slate-50:hover, html[data-theme] .hover\:bg-slate-100:hover, html[data-theme] .hover\:bg-slate-200:hover{ background-color: var(--surface-3) !important; }
+html[data-theme] .hover\:text-slate-900:hover, html[data-theme] .hover\:text-slate-700:hover{ color: var(--text) !important; }
+
+/* =========================================================================
+ * DARK-ONLY ACCENT FIXES — light tint chips → translucent dark tints; dark
+ * accent text → brighter; pastel borders → subtle. Solid -600 accent buttons
+ * are left alone (they pop on dark).
+ * ========================================================================= */
+html[data-theme="dark"] .text-indigo-600, html[data-theme="dark"] .text-indigo-700{ color:#a5b4fc !important; }
+html[data-theme="dark"] .text-blue-600, html[data-theme="dark"] .text-blue-700{ color:#93c5fd !important; }
+html[data-theme="dark"] .text-violet-700{ color:#c4b5fd !important; }
+html[data-theme="dark"] .text-emerald-600, html[data-theme="dark"] .text-emerald-700{ color:#6ee7b7 !important; }
+html[data-theme="dark"] .text-green-700{ color:#86efac !important; }
+html[data-theme="dark"] .text-amber-600, html[data-theme="dark"] .text-amber-700{ color:#fcd34d !important; }
+html[data-theme="dark"] .text-red-600, html[data-theme="dark"] .text-red-700{ color:#fca5a5 !important; }
+html[data-theme="dark"] .text-rose-600{ color:#fda4af !important; }
+html[data-theme="dark"] .text-orange-700{ color:#fdba74 !important; }
+
+html[data-theme="dark"] .bg-blue-50{ background-color: rgba(59, 130, 246, .15) !important; }
+html[data-theme="dark"] .bg-blue-100{ background-color: rgba(59, 130, 246, .20) !important; }
+html[data-theme="dark"] .bg-indigo-50{ background-color: rgba(99, 102, 241, .16) !important; }
+html[data-theme="dark"] .bg-violet-50{ background-color: rgba(139, 92, 246, .16) !important; }
+html[data-theme="dark"] .bg-amber-50, html[data-theme="dark"] .bg-amber-50\/40{ background-color: rgba(245, 158, 11, .14) !important; }
+html[data-theme="dark"] .bg-amber-100{ background-color: rgba(245, 158, 11, .20) !important; }
+html[data-theme="dark"] .bg-emerald-100{ background-color: rgba(16, 185, 129, .16) !important; }
+html[data-theme="dark"] .bg-green-50{ background-color: rgba(34, 197, 94, .14) !important; }
+html[data-theme="dark"] .bg-red-50{ background-color: rgba(239, 68, 68, .14) !important; }
+html[data-theme="dark"] .bg-orange-50{ background-color: rgba(249, 115, 22, .14) !important; }
+
+html[data-theme="dark"] .hover\:bg-blue-50:hover{ background-color: rgba(59, 130, 246, .20) !important; }
+html[data-theme="dark"] .hover\:bg-indigo-100:hover{ background-color: rgba(99, 102, 241, .24) !important; }
+
+html[data-theme="dark"] .border-blue-200{ border-color: rgba(59, 130, 246, .38) !important; }
+html[data-theme="dark"] .border-amber-200, html[data-theme="dark"] .border-amber-300{ border-color: rgba(245, 158, 11, .38) !important; }
+html[data-theme="dark"] .border-violet-200{ border-color: rgba(139, 92, 246, .38) !important; }
+html[data-theme="dark"] .border-emerald-200{ border-color: rgba(16, 185, 129, .38) !important; }
+
+/* page-defined .pos/.neg helpers (in each page's <style>) → themed + brighter on dark */
+html[data-theme] .pos{ color: var(--pos) !important; }
+html[data-theme] .neg{ color: var(--neg) !important; }
+
+/* =========================================================================
+ * PAGE COMPATIBILITY — selectors the individual pages hardcode in their own
+ * <style> blocks (these would otherwise stay light in dark mode).
+ * ========================================================================= */
+/* full-screen loading overlays (backtest / stock-backtest / mutual-funds) */
+html[data-theme] #overlay, html[data-theme] #ov, html[data-theme] #loadingOverlay{ background: var(--app-bg) !important; }
+/* sticky table headers that hardcode a light bg → themed (opaque so rows don't bleed through) */
+html[data-theme] table thead th{ background: var(--surface-2) !important; }
+/* custom input + label classes on the backtest builder */
+html[data-theme] .inp{ background-color: var(--surface) !important; color: var(--text) !important; border-color: var(--border-strong) !important; }
+html[data-theme] .lbl{ color: var(--text-muted) !important; }
+/* active-tab / sortable-header colours that are too dark on the dark theme */
+html[data-theme="dark"] .tab.active{ color:#93c5fd !important; border-color:#60a5fa !important; }
+html[data-theme="dark"] th[data-s]:hover{ color:#93c5fd !important; }
+
+/* =============================== theme pill =============================== */
+.sw-theme-switch{
+  display:inline-flex; gap:2px; padding:3px; margin-left:auto; flex:0 0 auto;
+  border-radius:999px; background:var(--surface-2); border:1px solid var(--border); box-shadow:var(--shadow);
+}
+/* header: let the page-nav shrink & scroll instead of overflowing; pill stays pinned right */
+html[data-theme] header > div{ gap:8px; }
+html[data-theme] header nav{ min-width:0; }
+.sw-theme-switch.floating{ position:fixed; top:10px; right:10px; z-index:60; }
+.sw-theme-switch button{
+  width:30px; height:28px; padding:0; border:0; background:transparent; border-radius:999px;
+  cursor:pointer; font-size:14px; line-height:1; display:inline-flex; align-items:center; justify-content:center;
+  color:var(--text-muted); transition:all var(--tr);
+}
+.sw-theme-switch button:hover{ background:var(--surface-3); color:var(--text); }
+.sw-theme-switch button[aria-pressed="true"]{
+  background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff;
+  box-shadow:0 3px 10px -3px var(--glow);
+}
+
+/* ============================== mobile polish ============================= */
+html{ -webkit-text-size-adjust:100%; }
+html[data-theme] body{ overflow-x:hidden; }                 /* belt-and-suspenders against side-scroll */
+html[data-theme] table{ -webkit-overflow-scrolling:touch; }
+@media (max-width:640px){
+  html[data-theme] header > div{ padding-left:12px; padding-right:12px; }
+  html[data-theme] .sw-theme-switch button{ width:32px; height:30px; font-size:15px; }  /* comfier tap targets */
+  /* comfortable minimum height for tappable controls */
+  html[data-theme] button, html[data-theme] select,
+  html[data-theme] input:not([type="checkbox"]):not([type="radio"]){ min-height:38px; }
+  html[data-theme] .sw-theme-switch button{ min-height:0; }   /* pill buttons keep their own size */
+}
+
+/* backtest "Filter criteria" rows: the factor <select> has very long option labels, and a
+   flex child won't shrink below its content (min-width:auto), so the row overflowed the screen
+   on mobile. Let the selects shrink; on phones, wrap so the factor dropdown gets its own line. */
+html[data-theme] .fRow{ min-width:0; }
+html[data-theme] .fRow .f-field, html[data-theme] .fRow .f-op, html[data-theme] .fRow .inp{ min-width:0; }
+@media (max-width:640px){
+  html[data-theme] .fRow{ flex-wrap:wrap; }
+  html[data-theme] .fRow .f-field{ flex:1 1 100%; }              /* factor dropdown on its own full-width line */
+  html[data-theme] .fRow .f-val{ flex:1 1 auto; width:auto; }    /* value input grows to fill the second line */
+}

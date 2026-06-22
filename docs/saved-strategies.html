@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STOCKSWORLD · Saved Strategies</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="./theme.css" />
+<script src="./theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./bt-sync.js"></script>
+<style>
+  body{font-feature-settings:"tnum" 1}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:.75rem}
+  .pos{color:#15803d}.neg{color:#b91c1c}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+  <div class="max-w-screen-xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <a href="./nse-bse-dashboard.html" class="flex items-center gap-2.5 shrink-0 group">
+      <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-center font-extrabold text-[13px] shadow-md group-hover:scale-105 transition">SW</span>
+      <span class="font-bold text-slate-900 tracking-tight hidden sm:block">STOCKS<span class="text-indigo-600">WORLD</span></span>
+    </a>
+    <nav class="flex items-center gap-1 overflow-x-auto">
+      <a href="./nse-bse-dashboard.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">📈<span class="hidden sm:inline">Stocks</span></a>
+      <a href="./stock-backtest.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">🧪<span class="hidden sm:inline">Backtest</span></a>
+      <a href="./backtest-history.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">📜<span class="hidden sm:inline">History</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-screen-xl mx-auto px-4 py-6">
+  <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+    <h1 class="text-xl md:text-2xl font-bold text-slate-900">⭐ Saved Strategies</h1>
+    <button id="clearAll" class="text-xs text-red-600 hover:underline font-semibold">Clear all</button>
+  </div>
+  <p class="text-xs text-slate-500 mb-4">Strategies you saved from backtests. Each card shows its survivorship-free performance. Click <b>Today's Picks</b> for the live deployment basket, or <b>Backtest</b> to re-open the full run. <a href="./stock-backtest.html" class="text-indigo-600 hover:underline">← back to Backtest</a></p>
+  <div id="status" class="text-xs text-slate-500 mb-3"></div>
+  <div id="list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</main>
+
+<!-- Today's Picks modal -->
+<div id="modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
+  <div class="max-w-5xl mx-auto card shadow-2xl">
+    <div class="flex items-start justify-between gap-3 p-4 border-b border-slate-200">
+      <div>
+        <h2 id="mTitle" class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">🎯 Today's Picks</h2>
+        <p id="mSub" class="text-[11px] text-slate-500 mt-0.5"></p>
+      </div>
+      <button id="mClose" class="text-slate-400 hover:text-slate-700 text-xl leading-none px-1">×</button>
+    </div>
+    <div class="p-4 space-y-4">
+      <!-- controls -->
+      <div class="flex flex-wrap items-end gap-3">
+        <div><label class="block text-[11px] font-semibold text-slate-500 mb-1">📅 As of date</label><input id="mDate" type="date" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm"/></div>
+        <div><label class="block text-[11px] font-semibold text-slate-500 mb-1">Capital ₹</label><input id="mCap" type="number" value="100000" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-sm w-32"/></div>
+        <button id="mRefresh" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700">↻ Refresh / Re-allocate</button>
+        <button id="mLive" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-rose-600 text-white hover:bg-rose-700">⚡ Go Live</button>
+        <button id="mLiveCfg" class="text-slate-400 hover:text-slate-700 text-base px-1" title="Set live-feed Worker URL">⚙</button>
+        <button id="mCsv" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700">⬇ Download CSV</button>
+        <span id="mSort" class="text-[11px] text-slate-400 ml-auto"></span>
+      </div>
+      <div id="mFilters" class="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2"></div>
+
+      <!-- hold calculator -->
+      <div class="bg-violet-50 border border-violet-200 rounded-lg px-3 py-2.5 flex flex-wrap items-end gap-3">
+        <span class="text-xs font-semibold text-violet-700">📐 Hold (buy once, no churn)</span>
+        <div><label class="block text-[10px] text-slate-500 mb-0.5">From</label><input id="hFrom" type="date" class="border border-slate-300 rounded px-2 py-1 text-xs"/></div>
+        <div><label class="block text-[10px] text-slate-500 mb-0.5">To</label><input id="hTo" type="date" class="border border-slate-300 rounded px-2 py-1 text-xs"/></div>
+        <button id="hCompute" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-violet-600 text-white hover:bg-violet-700">✅ Compute hold</button>
+        <span id="hOut" class="text-[11px] text-slate-600"></span>
+      </div>
+
+      <!-- summary -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-50 rounded-lg p-3 text-center"><div class="text-[11px] text-slate-500">Deployed</div><div id="sDeployed" class="text-lg font-bold text-slate-900">—</div></div>
+        <div class="bg-slate-50 rounded-lg p-3 text-center"><div class="text-[11px] text-slate-500">Cash remaining</div><div id="sCash" class="text-lg font-bold text-slate-900">—</div></div>
+        <div class="bg-slate-50 rounded-lg p-3 text-center"><div class="text-[11px] text-slate-500">Qualifying / Top-N</div><div id="sQual" class="text-lg font-bold text-slate-900">—</div></div>
+      </div>
+
+      <!-- basket -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-[11px] uppercase text-slate-500 border-b border-slate-200"><tr>
+            <th class="text-left py-2 pr-2">#</th><th class="text-left pr-3">Symbol</th>
+            <th class="text-right px-2">Chg %</th><th class="text-right px-2">% 52wHi</th><th class="text-right px-2">% 52wLo</th>
+            <th class="text-right px-2">RSI</th><th class="text-right px-2">Close ₹</th><th class="text-right px-2">Live ₹</th><th class="text-right px-2">Day %</th><th class="text-right px-2">Shares</th><th class="text-right px-2">Allocation</th></tr></thead>
+          <tbody id="mBody"></tbody>
+        </table>
+      </div>
+      <p class="text-[11px] text-slate-500"><b>How to use:</b> place LIMIT buy orders for these shares. Allocation totals ≤ capital (whole-share rounding). <b>During market hours (9:15–15:30 IST)</b> the basket auto-refreshes every 60s on the live (~15-min delayed) price — <b>Chg% · %52wHi · %52wLo · RSI · Live ₹ · Day %</b> all update live. <b>After 15:30</b> it shows the <b>official daily close from the bhavcopy</b> (the true last-30-min VWAP close, which no live tick can reproduce). The <i>basket itself</i> is always chosen from the last full close — intraday re-screening isn't possible from a single live tick.</p>
+
+      <!-- also qualifying -->
+      <div id="mAlsoWrap" class="hidden">
+        <button id="mAlsoToggle" class="text-xs font-semibold text-slate-600 hover:text-slate-900">▸ Also qualifying (<span id="mAlsoN">0</span>) — passed filters, ranked below Top-N</button>
+        <div id="mAlso" class="hidden overflow-x-auto mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./backtest-engine.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+let CUR = null;          // currently-open strategy in the modal
+const PERF = {};         // in-memory perf cache keyed by strategy id
+
+const FREQ = { 1: 'Monthly', 3: 'Quarterly', 6: 'Half-yearly', 12: 'Yearly' };
+const SORTL = { changePercent: 'Change % desc', rsi: 'RSI', d52: '% from 52w High', d52_low_pct: '% from 52w Low', indRank: 'Industry rank', mcap: 'Mcap', hist_mcap: 'Hist mcap' };
+
+function strategies() { return loadLS('bt_strategies'); }
+function clampDate(d, lo, hi) { return d < lo ? lo : d > hi ? hi : d; }
+
+/* ---------- card list ---------- */
+function render() {
+  const items = strategies();
+  const OWNER = !!(window.btSync && btSync.isOwner());   // only the owner sees add/delete controls
+  if (!items.length) {
+    $('list').innerHTML = '<div class="card p-8 text-center text-slate-400 text-sm md:col-span-3">No saved strategies yet. Run a backtest and click “⭐ Save as Strategy”.</div>';
+    return;
+  }
+  $('list').innerHTML = items.map(it => {
+    const c = it.cfg;
+    const expr = filterExpr(c) || '<span class="text-slate-400">no filters</span>';
+    return `<div class="card p-4 flex flex-col" data-card="${it.id}">
+      <div class="flex items-start justify-between gap-2">
+        <div class="font-bold text-slate-900 leading-snug">${esc(it.name)}</div>
+        ${OWNER ? `<button class="text-slate-300 hover:text-red-500 text-sm shrink-0" data-del="${it.id}" title="Delete">🗑️</button>` : ''}
+      </div>
+      <div class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5 flex-wrap">
+        <span class="font-semibold text-indigo-600">📊 ${esc(universeLabel(c))}</span><span>·</span>
+        <span>${FREQ[c.freq] || c.freq + 'mo'}</span><span>·</span><span>${c.topN} stocks</span>
+      </div>
+      <div class="mono text-[11px] text-slate-500 mt-1.5 break-words">${expr}</div>
+      <div class="text-[11px] text-slate-500 mt-1">Sort: <b>${SORTL[c.sortBy] || c.sortBy}</b> ${c.dir === 'high' ? 'desc' : 'asc'}</div>
+      <div class="bg-slate-50 rounded-lg p-3 mt-3" data-perf="${it.id}">
+        <div class="text-[11px] text-slate-500 mb-1">Backtest performance</div>
+        <div class="flex items-center justify-between">
+          <div class="text-sm">CAGR: <span class="font-bold text-slate-400">computing…</span></div>
+          <div class="text-sm">MaxDD: <span class="font-bold text-slate-400">…</span></div>
+        </div>
+        <div class="text-[10px] text-slate-400 mt-1">&nbsp;</div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mt-3">
+        <button class="px-3 py-2 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700" data-picks="${it.id}">🎯 Today's Picks</button>
+        <button class="px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-white hover:bg-slate-900" data-bt="${it.id}">📈 Backtest</button>
+      </div>
+    </div>`;
+  }).join('');
+  // wire buttons
+  $('list').querySelectorAll('[data-del]').forEach(b => b.onclick = () => { saveLS('bt_strategies', strategies().filter(x => x.id !== b.dataset.del)); if (window.btSync) btSync.pushStrategies(); render(); computeAllPerf(); });
+  $('list').querySelectorAll('[data-bt]').forEach(b => b.onclick = () => { const it = strategies().find(x => x.id === b.dataset.bt); if (it) { localStorage.setItem('bt_load', JSON.stringify(it.cfg)); location.href = './stock-backtest.html'; } });
+  $('list').querySelectorAll('[data-picks]').forEach(b => b.onclick = () => openPicks(b.dataset.picks));
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+/* ---------- live performance (computed lazily, one card at a time) ---------- */
+async function computeAllPerf() {
+  for (const it of strategies()) {
+    await new Promise(r => setTimeout(r, 0));   // yield so the UI stays responsive
+    const box = document.querySelector(`[data-perf="${it.id}"]`);
+    if (!box) continue;
+    try {
+      const c = { ...it.cfg };
+      c.start = clampDate(c.start, SF.start, SF.end);
+      c.end = clampDate(c.end, SF.start, SF.end);
+      const res = simulate(c);
+      PERF[it.id] = res;
+      box.innerHTML = `<div class="text-[11px] text-slate-500 mb-1">Backtest performance</div>
+        <div class="flex items-center justify-between">
+          <div class="text-sm">CAGR: <span class="font-bold ${res.cagr >= 0 ? 'pos' : 'neg'}">${pct(res.cagr)}</span></div>
+          <div class="text-sm">MaxDD: <span class="font-bold neg">-${res.maxDD.toFixed(2)}%</span></div>
+        </div>
+        <div class="text-[10px] text-slate-400 mt-1">${c.start} → ${c.end} · ₹1L → ${fmtINR(res.finalV)}</div>`;
+    } catch (e) {
+      box.querySelector('.text-slate-400') && (box.innerHTML = `<div class="text-[11px] text-red-500">Could not compute: ${esc(e.message)}</div>`);
+    }
+  }
+}
+
+/* ---------- Today's Picks modal ---------- */
+function openPicks(id) {
+  const it = strategies().find(x => x.id === id); if (!it) return;
+  CUR = it;
+  $('mTitle').innerHTML = `🎯 Today's Picks · ${esc(it.name)}`;
+  $('mFilters').innerHTML = `<b>Universe:</b> ${esc(universeLabel(it.cfg))} &nbsp;·&nbsp; <b>Rank:</b> ${SORTL[it.cfg.sortBy] || it.cfg.sortBy} (${it.cfg.dir}) &nbsp;·&nbsp; <b>Filters:</b> ${esc(filterExpr(it.cfg) || 'none')}`;
+  $('mSort').textContent = 'Sort: ' + (SORTL[it.cfg.sortBy] || it.cfg.sortBy);
+  $('mCap').value = it.cfg.capital || 100000;
+  $('mDate').min = SF.start; $('mDate').max = SF.end; $('mDate').value = SF.end;
+  $('hFrom').min = SF.start; $('hFrom').max = SF.end; $('hTo').min = SF.start; $('hTo').max = SF.end;
+  $('hFrom').value = SF.start; $('hTo').value = SF.end; $('hOut').textContent = '';
+  LIVE = null;
+  $('modal').classList.remove('hidden');
+  refreshPicks();
+  // during market hours, auto-go-live and keep it refreshing; after 15:30 the bhavcopy close stands
+  startLive();
+}
+function closeModal() { stopLive(); $('modal').classList.add('hidden'); CUR = null; }
+
+let LAST_BASKET = null, LIVE = null, LIVE_TIMER = null;   // LIVE = {ts, data:{SYM:{ltp,prevClose}}}
+function liveLtp(sym) { return (LIVE && LIVE.data[sym] && LIVE.data[sym].ltp != null) ? LIVE.data[sym].ltp : null; }
+/* NSE continuous session: Mon–Fri 09:15–15:30 IST. Computed from absolute time so it's correct
+   regardless of the viewer's own timezone. Trading holidays aren't excluded — on a holiday the
+   feed just returns the prior close, so the basket stays at its last value (harmless). The official
+   close is the VWAP of the last 30 min and only exists in the evening bhavcopy, never in a live
+   tick — so after 15:30 we stop fetching live and let the (bhavcopy-sourced) daily close stand. */
+function marketOpen() {
+  const d = new Date(Date.now() + 330 * 60000);             // shift epoch into IST
+  const dow = d.getUTCDay(); if (dow === 0 || dow === 6) return false;
+  const mins = d.getUTCHours() * 60 + d.getUTCMinutes();
+  return mins >= 555 && mins <= 930;                         // 09:15 … 15:30 IST
+}
+function stopLive() { if (LIVE_TIMER) { clearInterval(LIVE_TIMER); LIVE_TIMER = null; } }
+// Keep the basket live while the market and the modal are both open; auto-stop at 15:30.
+function startLive() {
+  stopLive();
+  if (!localStorage.getItem('live_worker_url') || !marketOpen()) return;
+  goLive(true);                                              // fetch now…
+  LIVE_TIMER = setInterval(() => {                           // …then every 60s until the close
+    if (!CUR || !marketOpen()) { stopLive(); if (CUR) refreshPicks(); return; }
+    goLive(true);
+  }, 60000);
+}
+/* When Go Live is on (and we're viewing "today"), recompute the screen metrics — Chg%, %52wHi,
+   %52wLo, RSI — off the LIVE price instead of the last daily close. The loaded price history is
+   split-adjusted while the live LTP is the raw market price; they differ only by a constant scale,
+   so we map the live print into adjusted space via the raw last close, then reuse the engine math. */
+function liveMetrics(r, ltp) {
+  const tkr = r.tkr, s = SERIES[tkr]; if (!s) return null;
+  const rawLast = META[tkr] && META[tkr].raw; if (!rawLast || !r.price) return null;
+  const off = dayOff(SF.end);
+  const liveAdj = r.price * (ltp / rawLast);                       // live price in the adjusted series' units
+  const lookOff = off - Math.round((CUR.cfg.lookback || 0) * 30.44);
+  const p0 = priceAt(tkr, lookOff);
+  const chg = (p0 && p0 > 0) ? (liveAdj / p0 - 1) * 100 : r.chg;   // return over the strategy's lookback window
+  const hl = hl52(tkr, off);                                       // fold the live print into the 52w high/low
+  const hi = Math.max(hl ? hl.hi : liveAdj, liveAdj), low = Math.min(hl ? hl.low : liveAdj, liveAdj);
+  return { chg, d52: (hi - liveAdj) / hi * 100, d52low: (liveAdj - low) / low * 100, rsi: rsiLive(tkr, off, Math.round(liveAdj * 100)) };
+}
+// Wilder RSI(14), seeded exactly like the engine's rsi14 but with the live print as the most recent close.
+function rsiLive(tkr, off, liveX) {
+  const s = SERIES[tkr]; if (!s) return null;
+  const i = idxLE(s.d, off); if (i < 15) return null;
+  const start = Math.max(1, i - 100), a = [];
+  for (let k = start - 1; k <= i; k++) a.push(s.p[k]);
+  const t = new Date(), today = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+  if (SF.end < today) a.push(liveX); else a[a.length - 1] = liveX; // new trading day → append; same day → replace last close
+  const n = 14; let avgG = 0, avgL = 0, k = 1, cnt = 0;
+  for (; k < a.length && cnt < n; k++, cnt++) { const ch = a[k] - a[k - 1]; if (ch > 0) avgG += ch; else avgL -= ch; }
+  avgG /= n; avgL /= n;
+  for (; k < a.length; k++) { const ch = a[k] - a[k - 1]; avgG = (avgG * (n - 1) + (ch > 0 ? ch : 0)) / n; avgL = (avgL * (n - 1) + (ch < 0 ? -ch : 0)) / n; }
+  if (avgG + avgL === 0) return 50;
+  return 100 - 100 / (1 + avgG / (avgL || 1e-9));
+}
+function refreshPicks() {
+  if (!CUR) return;
+  const date = clampDate($('mDate').value || SF.end, SF.start, SF.end);
+  $('mDate').value = date;
+  const cap = +$('mCap').value || 100000;
+  const liveTag = LIVE
+    ? `<span class="text-rose-600 font-semibold">🔴 LIVE</span> · Chg%/52w/RSI off live price · ${LIVE_TIMER ? 'auto-refresh 60s · ' : ''}fetched ${new Date(LIVE.ts).toLocaleTimeString('en-IN')} · Yahoo NSE (~15 min delay)`
+    : 'official daily close (bhavcopy)';
+  $('mSub').innerHTML = `As of ${date} · ${liveTag} · ${SF.nDead} delisted names included`;
+  const ranked = screenAsOf(CUR.cfg, date);
+  const picks = ranked.slice(0, CUR.cfg.topN);
+  // Effective price: live LTP > raw market close (when screening "today") > adjusted close.
+  // The adjusted series level can drift from the market price on stocks with old corporate
+  // actions (it's return-consistent, not level-consistent) — raw is the real ₹ to trade at.
+  const atLatest = date === SF.end;
+  const baseOf = r => (atLatest && META[r.tkr] && META[r.tkr].raw) ? META[r.tkr].raw : r.price;
+  const per = cap / (picks.length || 1); let deployed = 0;
+  const rows = picks.map(r => {
+    const base = baseOf(r);
+    const ltp = liveLtp(r.sym);
+    const px = ltp != null ? ltp : base;
+    const shares = Math.floor(per / px); const alloc = shares * px; deployed += alloc;
+    const row = { ...r, base, px, shares, alloc };
+    if (ltp != null && atLatest) {                       // live: recompute Chg% / %52wHi / %52wLo / RSI off the live price
+      const lm = liveMetrics(r, ltp);
+      if (lm) { row.chg = lm.chg; row.d52 = lm.d52; row.d52low = lm.d52low; row.rsi = lm.rsi; }
+    }
+    return row;
+  });
+  LAST_BASKET = { date, rows };
+  $('sDeployed').textContent = fmtINR(deployed);
+  $('sCash').textContent = fmtINR(cap - deployed);
+  $('sQual').textContent = `${ranked.length} / ${CUR.cfg.topN}`;
+  $('mBody').innerHTML = rows.length ? rows.map((r, i) => {
+    const live = liveLtp(r.sym); const pc = (LIVE && LIVE.data[r.sym]) ? LIVE.data[r.sym].prevClose : null;
+    const delta = (live != null && pc) ? (live / pc - 1) * 100 : null;   // true day change (live vs Yahoo prev close)
+    return `<tr class="border-b border-slate-50">
+    <td class="py-1.5 pr-2 text-slate-400">${i + 1}</td>
+    <td class="pr-3 font-semibold text-indigo-700">${esc(r.sym)}</td>
+    <td class="text-right px-2 ${r.chg >= 0 ? 'pos' : 'neg'}">${pct(r.chg)}</td>
+    <td class="text-right px-2">${r.d52.toFixed(2)}%</td>
+    <td class="text-right px-2">${r.d52low.toFixed(2)}%</td>
+    <td class="text-right px-2">${r.rsi == null ? '—' : r.rsi.toFixed(2)}</td>
+    <td class="text-right px-2">${r.base.toFixed(2)}</td>
+    <td class="text-right px-2 ${live != null ? 'font-semibold text-rose-600' : 'text-slate-300'}">${live != null ? live.toFixed(2) : '—'}</td>
+    <td class="text-right px-2 ${delta == null ? 'text-slate-300' : delta >= 0 ? 'pos' : 'neg'}">${delta == null ? '—' : pct(delta)}</td>
+    <td class="text-right px-2 font-semibold">${r.shares}</td>
+    <td class="text-right px-2">${fmtINR(r.alloc)}</td></tr>`;
+  }).join('')
+    : '<tr><td colspan="11" class="py-4 text-center text-slate-400">No stocks qualify on this date.</td></tr>';
+  // also qualifying
+  const also = ranked.slice(CUR.cfg.topN);
+  if (also.length) {
+    $('mAlsoWrap').classList.remove('hidden'); $('mAlsoN').textContent = also.length;
+    $('mAlso').innerHTML = `<table class="w-full text-sm"><thead class="text-[11px] uppercase text-slate-500 border-b border-slate-200"><tr>
+      <th class="text-left py-1 pr-2">#</th><th class="text-left pr-3">Symbol</th><th class="text-right px-2">Chg %</th><th class="text-right px-2">% 52wHi</th><th class="text-right px-2">% 52wLo</th><th class="text-right px-2">RSI</th><th class="text-right px-2">Close ₹</th></tr></thead>
+      <tbody>${also.map((r, i) => `<tr class="border-b border-slate-50"><td class="py-1 pr-2 text-slate-400">${CUR.cfg.topN + i + 1}</td><td class="pr-3 font-medium">${esc(r.sym)}</td><td class="text-right px-2 ${r.chg >= 0 ? 'pos' : 'neg'}">${pct(r.chg)}</td><td class="text-right px-2">${r.d52.toFixed(2)}%</td><td class="text-right px-2">${r.d52low.toFixed(2)}%</td><td class="text-right px-2">${r.rsi == null ? '—' : r.rsi.toFixed(2)}</td><td class="text-right px-2">${baseOf(r).toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+  } else { $('mAlsoWrap').classList.add('hidden'); }
+}
+function downloadCSV() {
+  if (!LAST_BASKET || !LAST_BASKET.rows.length) return;
+  const head = ['Rank', 'Symbol', 'Change%', 'Pct_from_52wHigh', 'Pct_from_52wLow', 'RSI', 'Close', 'Live', 'DayPct', 'Shares', 'Allocation'];
+  const lines = [head.join(',')].concat(LAST_BASKET.rows.map((r, i) => {
+    const live = liveLtp(r.sym); const pc = (LIVE && LIVE.data[r.sym]) ? LIVE.data[r.sym].prevClose : null;
+    const delta = (live != null && pc) ? (live / pc - 1) * 100 : null;
+    return [i + 1, r.sym, r.chg.toFixed(2), r.d52.toFixed(2), r.d52low.toFixed(2), r.rsi == null ? '' : r.rsi.toFixed(2),
+      (r.base != null ? r.base : r.price).toFixed(2), live == null ? '' : live.toFixed(2), delta == null ? '' : delta.toFixed(2), r.shares, Math.round(r.alloc)].join(',');
+  }));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `picks_${(CUR ? CUR.name : 'strategy').replace(/[^a-z0-9]+/gi, '_')}_${LAST_BASKET.date}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+/* ---------- live feed (via user-deployed Cloudflare Worker) ---------- */
+function setWorkerUrl() {
+  const cur = localStorage.getItem('live_worker_url') || '';
+  const v = prompt('Paste your Cloudflare Worker URL for live quotes.\n(Setup guide: scripts/LIVE_FEED_SETUP.md — looks like https://xxx.workers.dev)', cur);
+  if (v == null) return cur;
+  const t = v.trim();
+  if (t && /^https?:\/\//.test(t)) { localStorage.setItem('live_worker_url', t); return t; }
+  if (t === '') { localStorage.removeItem('live_worker_url'); return ''; }
+  alert('That doesn\'t look like a URL (must start with https://).'); return cur;
+}
+async function goLive(silent) {
+  if (!CUR || !LAST_BASKET) return;
+  let wurl = localStorage.getItem('live_worker_url') || '';
+  if (!wurl) { if (silent) return; wurl = setWorkerUrl(); if (!wurl) return; }
+  const syms = LAST_BASKET.rows.map(r => r.sym);
+  if (!syms.length) { alert('No stocks in the basket to fetch.'); return; }
+  const btn = $('mLive'); const prev = btn.textContent; btn.textContent = '⏳ Fetching…'; btn.disabled = true;
+  try {
+    const sep = wurl.includes('?') ? '&' : '?';
+    const res = await fetch(wurl + sep + 'symbols=' + encodeURIComponent(syms.join(',')));
+    if (!res.ok) throw new Error('Worker returned HTTP ' + res.status);
+    const d = await res.json();
+    if (!d || !d.data || !Object.keys(d.data).length) throw new Error('no quotes returned (symbols may be BSE-only, or the source is rate-limiting)');
+    LIVE = { ts: d.asOf || Date.now(), data: d.data };
+    refreshPicks();
+  } catch (e) {
+    if (!silent) alert('Live fetch failed: ' + e.message + '\n\nCheck the Worker URL (⚙ button) and that opening it in a browser returns JSON.\nSee scripts/LIVE_FEED_SETUP.md.');
+  } finally { btn.textContent = prev; btn.disabled = false; }
+}
+function runHold() {
+  if (!CUR) return;
+  const from = clampDate($('hFrom').value || SF.start, SF.start, SF.end);
+  const to = clampDate($('hTo').value || SF.end, SF.start, SF.end);
+  const cap = +$('mCap').value || 100000;
+  if (from >= to) { $('hOut').textContent = 'Pick From < To.'; return; }
+  const h = computeHold(CUR.cfg, from, to, cap);
+  const cls = h.retPct >= 0 ? 'pos' : 'neg';
+  $('hOut').innerHTML = `Buy ${h.rows.length} on ${from}, hold to ${to}: <b class="${cls}">${pct(h.retPct)}</b> · ${fmtINR(h.startVal)} → <b>${fmtINR(h.endVal)}</b>`;
+}
+
+/* ---------- boot ---------- */
+$('clearAll').onclick = () => { if (confirm('Delete ALL shared strategies for everyone?')) { saveLS('bt_strategies', []); if (window.btSync) btSync.pushStrategies(); render(); } };
+if ($('clearAll') && !(window.btSync && btSync.isOwner())) $('clearAll').style.display = 'none';   // visitors can't clear the shared list
+$('mClose').onclick = closeModal;
+$('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
+$('mRefresh').onclick = () => { LIVE = null; refreshPicks(); startLive(); };
+$('mDate').onchange = () => { LIVE = null; stopLive(); refreshPicks(); if ($('mDate').value === SF.end) startLive(); };   // live only when viewing "today" during market hours
+$('mCsv').onclick = downloadCSV;
+$('mLive').onclick = () => { if (marketOpen()) startLive(); else goLive(); };   // manual: keep-live during the session, one-shot snapshot after the close
+$('mLiveCfg').onclick = setWorkerUrl;
+$('hCompute').onclick = runHold;
+$('mAlsoToggle').onclick = () => { const a = $('mAlso'); a.classList.toggle('hidden'); $('mAlsoToggle').innerHTML = $('mAlsoToggle').innerHTML.replace(a.classList.contains('hidden') ? '▾' : '▸', a.classList.contains('hidden') ? '▸' : '▾'); };
+
+(async function boot() {
+  if (window.btSync) { try { await btSync.pullStrategies(); } catch (e) {} }   // load the shared strategies (everyone)
+  render();   // show cards immediately (perf = "computing…")
+  if (!strategies().length) { $('status').textContent = ''; return; }
+  $('status').textContent = 'Loading survivorship-free data…';
+  try { await loadEngineData(m => { $('status').textContent = m || ''; }); }
+  catch (e) { $('status').innerHTML = '<span class="text-red-500">Could not load market data — has the survivorship-free dataset been built/deployed yet?</span>'; return; }
+  $('status').textContent = `✅ Survivorship-free data ${SF.start} → ${SF.end} · ${SF.nTot} stocks (${SF.nDead} delisted).`;
+  computeAllPerf();
+})();
+</script>
+</body>
+</html>

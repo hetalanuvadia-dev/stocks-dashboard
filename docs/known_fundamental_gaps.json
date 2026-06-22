@@ -1,0 +1,1557 @@
+{
+ "_meta": {
+  "as_of": "2026-06-20",
+  "total_congap_targets": 582,
+  "recovered": 324,
+  "documented_unrecoverable": 258,
+  "method": "vision deep-read of BSE filings incl IRDAI insurer Shareholders'/consolidated P&L; verified ONLY by stored-neighbor anchor / date-header / internal reconciliation (9M=Q1+Q2+Q3,H1=Q1+Q2,PBT-tax=PAT) / cross-filing / explicit press-release figure \u2014 no assumptions",
+  "reason_counts": {
+   "no_consolidated_filing_on_bse": 130,
+   "other_unverifiable": 19,
+   "wrong_period_filing_only": 12,
+   "annual_only_consolidated": 36,
+   "no_anchor_or_basis_conflict": 18,
+   "distressed_or_restructured_or_nonfiling": 19,
+   "standalone_only_or_not_published": 16,
+   "nse_only_not_on_bse": 8
+  }
+ },
+ "gaps": {
+  "ANDHRSUGAR|20210930": {
+   "sym": "ANDHRSUGAR",
+   "qe": 20210930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ANDHRSUGAR|20220331": {
+   "sym": "ANDHRSUGAR",
+   "qe": 20220331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "NFL|20190331": {
+   "sym": "NFL",
+   "qe": 20190331,
+   "reason": "other_unverifiable",
+   "note": "reattempt-skip: con annual-YTD only"
+  },
+  "NFL|20190630": {
+   "sym": "NFL",
+   "qe": 20190630,
+   "reason": "other_unverifiable",
+   "note": "skip: no stored neighbor to verify"
+  },
+  "EIDPARRY|20210331": {
+   "sym": "EIDPARRY",
+   "qe": 20210331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "RAJESHEXPO|20200630": {
+   "sym": "RAJESHEXPO",
+   "qe": 20200630,
+   "reason": "wrong_period_filing_only",
+   "note": "reattempt-skip: wrong-period (FY20 annual)"
+  },
+  "RAJESHEXPO|20200930": {
+   "sym": "RAJESHEXPO",
+   "qe": 20200930,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "RAJESHEXPO|20201231": {
+   "sym": "RAJESHEXPO",
+   "qe": 20201231,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "RAJESHEXPO|20241231": {
+   "sym": "RAJESHEXPO",
+   "qe": 20241231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "RAJESHEXPO|20250331": {
+   "sym": "RAJESHEXPO",
+   "qe": 20250331,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "skip: yago 12.45 vs stored -31.57 mismatch; unreliable issuer"
+  },
+  "RAJESHEXPO|20250630": {
+   "sym": "RAJESHEXPO",
+   "qe": 20250630,
+   "reason": "wrong_period_filing_only",
+   "note": "reattempt-skip: wrong-period (FY25 annual)"
+  },
+  "GVKPIL|20210630": {
+   "sym": "GVKPIL",
+   "qe": 20210630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "nocode/defunct"
+  },
+  "GVKPIL|20210930": {
+   "sym": "GVKPIL",
+   "qe": 20210930,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "nocode/defunct"
+  },
+  "GVKPIL|20211231": {
+   "sym": "GVKPIL",
+   "qe": 20211231,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "nocode/defunct"
+  },
+  "SUNDARMFIN|20191231": {
+   "sym": "SUNDARMFIN",
+   "qe": 20191231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUNDARMFIN|20200331": {
+   "sym": "SUNDARMFIN",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUNDARMFIN|20200630": {
+   "sym": "SUNDARMFIN",
+   "qe": 20200630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUNDARMFIN|20201231": {
+   "sym": "SUNDARMFIN",
+   "qe": 20201231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUNDARMFIN|20210331": {
+   "sym": "SUNDARMFIN",
+   "qe": 20210331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUNDARMFIN|20210630": {
+   "sym": "SUNDARMFIN",
+   "qe": 20210630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUNDARMFIN|20211231": {
+   "sym": "SUNDARMFIN",
+   "qe": 20211231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUNDARMFIN|20220331": {
+   "sym": "SUNDARMFIN",
+   "qe": 20220331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "STLTECH|20220630": {
+   "sym": "STLTECH",
+   "qe": 20220630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "JBMA|20190630": {
+   "sym": "JBMA",
+   "qe": 20190630,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: prev 23.18 matches no con row"
+  },
+  "JUBLPHARMA|20190630": {
+   "sym": "JUBLPHARMA",
+   "qe": 20190630,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: Q1FY20 investor-deck (rounded), prev Mar-2019 not a column; no anchorable stored neighbor"
+  },
+  "PIRAMALFIN|20210930": {
+   "sym": "PIRAMALFIN",
+   "qe": 20210930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIRAMALFIN|20211231": {
+   "sym": "PIRAMALFIN",
+   "qe": 20211231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIRAMALFIN|20220331": {
+   "sym": "PIRAMALFIN",
+   "qe": 20220331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIRAMALFIN|20220930": {
+   "sym": "PIRAMALFIN",
+   "qe": 20220930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIRAMALFIN|20230331": {
+   "sym": "PIRAMALFIN",
+   "qe": 20230331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIRAMALFIN|20230630": {
+   "sym": "PIRAMALFIN",
+   "qe": 20230630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIRAMALFIN|20230930": {
+   "sym": "PIRAMALFIN",
+   "qe": 20230930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIRAMALFIN|20240630": {
+   "sym": "PIRAMALFIN",
+   "qe": 20240630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "CYIENT|20250331": {
+   "sym": "CYIENT",
+   "qe": 20250331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "LTF|20190930": {
+   "sym": "LTF",
+   "qe": 20190930,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "KOLTEPATIL|20190630": {
+   "sym": "KOLTEPATIL",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "CONSOFINVT|20200630": {
+   "sym": "CONSOFINVT",
+   "qe": 20200630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "nocode/defunct"
+  },
+  "TI|20190630": {
+   "sym": "TI",
+   "qe": 20190630,
+   "reason": "wrong_period_filing_only",
+   "note": "reattempt-skip: wrong-period (FY19 annual)"
+  },
+  "TTKPRESTIG|20190331": {
+   "sym": "TTKPRESTIG",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual-only"
+  },
+  "HEXT|20201231": {
+   "sym": "HEXT",
+   "qe": 20201231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20210331": {
+   "sym": "HEXT",
+   "qe": 20210331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20210630": {
+   "sym": "HEXT",
+   "qe": 20210630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20210930": {
+   "sym": "HEXT",
+   "qe": 20210930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20211231": {
+   "sym": "HEXT",
+   "qe": 20211231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20220331": {
+   "sym": "HEXT",
+   "qe": 20220331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20220630": {
+   "sym": "HEXT",
+   "qe": 20220630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20220930": {
+   "sym": "HEXT",
+   "qe": 20220930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20221231": {
+   "sym": "HEXT",
+   "qe": 20221231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20230331": {
+   "sym": "HEXT",
+   "qe": 20230331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20230630": {
+   "sym": "HEXT",
+   "qe": 20230630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HEXT|20230930": {
+   "sym": "HEXT",
+   "qe": 20230930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BFUTILITIE|20190331": {
+   "sym": "BFUTILITIE",
+   "qe": 20190331,
+   "reason": "other_unverifiable",
+   "note": "skip: both neighbors None"
+  },
+  "BFUTILITIE|20241231": {
+   "sym": "BFUTILITIE",
+   "qe": 20241231,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: con not published (std only)"
+  },
+  "UNITECH|20190331": {
+   "sym": "UNITECH",
+   "qe": 20190331,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "nocode/defunct"
+  },
+  "UNITECH|20210630": {
+   "sym": "UNITECH",
+   "qe": 20210630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "nocode/defunct"
+  },
+  "ELECON|20220630": {
+   "sym": "ELECON",
+   "qe": 20220630,
+   "reason": "other_unverifiable",
+   "note": "wave1-skip: RPT-disclosure page only"
+  },
+  "GPPL|20190331": {
+   "sym": "GPPL",
+   "qe": 20190331,
+   "reason": "other_unverifiable",
+   "note": "skip: no stored neighbor"
+  },
+  "GPPL|20190630": {
+   "sym": "GPPL",
+   "qe": 20190630,
+   "reason": "other_unverifiable",
+   "note": "skip: both neighbors None"
+  },
+  "MBLINFRA|20190331": {
+   "sym": "MBLINFRA",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual-only"
+  },
+  "RAMCOCEM|20190331": {
+   "sym": "RAMCOCEM",
+   "qe": 20190331,
+   "reason": "other_unverifiable",
+   "note": "skip-structural: consolidated reported ANNUALLY ONLY (no Q4 quarter column); stored con neighbors None"
+  },
+  "ALOKINDS|20200630": {
+   "sym": "ALOKINDS",
+   "qe": 20200630,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "ALOKINDS|20200930": {
+   "sym": "ALOKINDS",
+   "qe": 20200930,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "DBL|20210331": {
+   "sym": "DBL",
+   "qe": 20210331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ADANIENSOL|20220630": {
+   "sym": "ADANIENSOL",
+   "qe": 20220630,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "wave1-skip: anchor conflict (prev row7 vs yago row9)"
+  },
+  "BORORENEW|20200331": {
+   "sym": "BORORENEW",
+   "qe": 20200331,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "BORORENEW|20200630": {
+   "sym": "BORORENEW",
+   "qe": 20200630,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "BORORENEW|20200930": {
+   "sym": "BORORENEW",
+   "qe": 20200930,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "BORORENEW|20201231": {
+   "sym": "BORORENEW",
+   "qe": 20201231,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "BORORENEW|20210331": {
+   "sym": "BORORENEW",
+   "qe": 20210331,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "BORORENEW|20210630": {
+   "sym": "BORORENEW",
+   "qe": 20210630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "BORORENEW|20210930": {
+   "sym": "BORORENEW",
+   "qe": 20210930,
+   "reason": "other_unverifiable",
+   "note": "skip: both neighbors None"
+  },
+  "BORORENEW|20211231": {
+   "sym": "BORORENEW",
+   "qe": 20211231,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "BORORENEW|20220331": {
+   "sym": "BORORENEW",
+   "qe": 20220331,
+   "reason": "other_unverifiable",
+   "note": "skip: no stored neighbor to verify"
+  },
+  "JSWDULUX|20190331": {
+   "sym": "JSWDULUX",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual/12M-only"
+  },
+  "BCG|20240630": {
+   "sym": "BCG",
+   "qe": 20240630,
+   "reason": "wrong_period_filing_only",
+   "note": "wave1-skip: wrong-period (Sep23 scanned)"
+  },
+  "BCG|20250331": {
+   "sym": "BCG",
+   "qe": 20250331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "FMGOETZE|20221231": {
+   "sym": "FMGOETZE",
+   "qe": 20221231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "DALMIASUG|20221231": {
+   "sym": "DALMIASUG",
+   "qe": 20221231,
+   "reason": "standalone_only_or_not_published",
+   "note": "wave1-skip: standalone-only, con!=std"
+  },
+  "DALMIASUG|20230331": {
+   "sym": "DALMIASUG",
+   "qe": 20230331,
+   "reason": "standalone_only_or_not_published",
+   "note": "wave1-skip: standalone-only, con!=std"
+  },
+  "DALMIASUG|20250930": {
+   "sym": "DALMIASUG",
+   "qe": 20250930,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "reattempt-skip: no con row matches; restated demerger"
+  },
+  "GAYAPROJ|20230331": {
+   "sym": "GAYAPROJ",
+   "qe": 20230331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GAYAPROJ|20230630": {
+   "sym": "GAYAPROJ",
+   "qe": 20230630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "wave1-skip: cover-letter only (CIRP)"
+  },
+  "GAYAPROJ|20230930": {
+   "sym": "GAYAPROJ",
+   "qe": 20230930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GAYAPROJ|20231231": {
+   "sym": "GAYAPROJ",
+   "qe": 20231231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GAYAPROJ|20240331": {
+   "sym": "GAYAPROJ",
+   "qe": 20240331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GAYAPROJ|20240630": {
+   "sym": "GAYAPROJ",
+   "qe": 20240630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GAYAPROJ|20240930": {
+   "sym": "GAYAPROJ",
+   "qe": 20240930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GAYAPROJ|20241231": {
+   "sym": "GAYAPROJ",
+   "qe": 20241231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "JINDALPOLY|20190331": {
+   "sym": "JINDALPOLY",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "CHOLAHLDNG|20190331": {
+   "sym": "CHOLAHLDNG",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual-only"
+  },
+  "CHOLAHLDNG|20190630": {
+   "sym": "CHOLAHLDNG",
+   "qe": 20190630,
+   "reason": "other_unverifiable",
+   "note": "skip: no stored neighbor to verify"
+  },
+  "ABCAPITAL|20190331": {
+   "sym": "ABCAPITAL",
+   "qe": 20190331,
+   "reason": "other_unverifiable",
+   "note": "reattempt-skip: neighbors match no con row"
+  },
+  "ABCAPITAL|20190930": {
+   "sym": "ABCAPITAL",
+   "qe": 20190930,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: prev coincides target col; no anchor"
+  },
+  "GICRE|20220331": {
+   "sym": "GICRE",
+   "qe": 20220331,
+   "reason": "standalone_only_or_not_published",
+   "note": "cached PDF is STANDALONE IRDAI only (Mar-2021 std 1260.44); stored series is CONSOLIDATED (2045.48); no consolidated summary in this PDF"
+  },
+  "GICRE|20220630": {
+   "sym": "GICRE",
+   "qe": 20220630,
+   "reason": "other_unverifiable",
+   "note": "yago Jun-2021 1260.44 (con) not present in cached PDF (summary/segment pages only)"
+  },
+  "GICRE|20240331": {
+   "sym": "GICRE",
+   "qe": 20240331,
+   "reason": "other_unverifiable",
+   "note": "dense lakh consolidated stmt; stored prev 1517.96 doesn't match filing Dec-2023 col; basis inconsistency, no clean read"
+  },
+  "FINCABLES|20190331": {
+   "sym": "FINCABLES",
+   "qe": 20190331,
+   "reason": "other_unverifiable",
+   "note": "skip: no stored neighbor"
+  },
+  "PVP|20200331": {
+   "sym": "PVP",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PVP|20200630": {
+   "sym": "PVP",
+   "qe": 20200630,
+   "reason": "other_unverifiable",
+   "note": "skip: no stored neighbor to verify"
+  },
+  "GHCL|20190331": {
+   "sym": "GHCL",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "skip-structural: balance-sheet page + consolidated annual-only; neighbors None"
+  },
+  "GHCL|20190630": {
+   "sym": "GHCL",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SONACOMS|20201231": {
+   "sym": "SONACOMS",
+   "qe": 20201231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SONACOMS|20210331": {
+   "sym": "SONACOMS",
+   "qe": 20210331,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "KIRLFER|20221231": {
+   "sym": "KIRLFER",
+   "qe": 20221231,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: prev 82.0 matches no con row"
+  },
+  "KIRLFER|20230331": {
+   "sym": "KIRLFER",
+   "qe": 20230331,
+   "reason": "other_unverifiable",
+   "note": "skip: no stored neighbor to verify"
+  },
+  "SAMMAANCAP|20190630": {
+   "sym": "SAMMAANCAP",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "CCL|20190630": {
+   "sym": "CCL",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GEOJITFSL|20190930": {
+   "sym": "GEOJITFSL",
+   "qe": 20190930,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: prev coincides target col; no anchor"
+  },
+  "INDUSINDBK|20190930": {
+   "sym": "INDUSINDBK",
+   "qe": 20190930,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "ANSALAPI|20190331": {
+   "sym": "ANSALAPI",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual-only"
+  },
+  "ANSALAPI|20190630": {
+   "sym": "ANSALAPI",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ATLASCYCLE|20190630": {
+   "sym": "ATLASCYCLE",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "KARURVYSYA|20190930": {
+   "sym": "KARURVYSYA",
+   "qe": 20190930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "KARURVYSYA|20191231": {
+   "sym": "KARURVYSYA",
+   "qe": 20191231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "KARURVYSYA|20200630": {
+   "sym": "KARURVYSYA",
+   "qe": 20200630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "KARURVYSYA|20200930": {
+   "sym": "KARURVYSYA",
+   "qe": 20200930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "KARURVYSYA|20201231": {
+   "sym": "KARURVYSYA",
+   "qe": 20201231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "AEGISVOPAK|20240630": {
+   "sym": "AEGISVOPAK",
+   "qe": 20240630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "AEGISVOPAK|20240930": {
+   "sym": "AEGISVOPAK",
+   "qe": 20240930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "TAKE|20190630": {
+   "sym": "TAKE",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SPANDANA|20220331": {
+   "sym": "SPANDANA",
+   "qe": 20220331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "SPANDANA|20220630": {
+   "sym": "SPANDANA",
+   "qe": 20220630,
+   "reason": "wrong_period_filing_only",
+   "note": "wave1-skip: wrong-period (FY22 annual)"
+  },
+  "SPANDANA|20220930": {
+   "sym": "SPANDANA",
+   "qe": 20220930,
+   "reason": "other_unverifiable",
+   "note": "wave1-skip: investor-deck, yago 1.3% off"
+  },
+  "GAEL|20191231": {
+   "sym": "GAEL",
+   "qe": 20191231,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "GAEL|20200331": {
+   "sym": "GAEL",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GAEL|20200630": {
+   "sym": "GAEL",
+   "qe": 20200630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HFCL|20220630": {
+   "sym": "HFCL",
+   "qe": 20220630,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: total-vs-owners anchor conflict"
+  },
+  "ICICIGI|20220630": {
+   "sym": "ICICIGI",
+   "qe": 20220630,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "cached filing Jun-2021 col (194.58) conflicts with stored yago 151.63; basis/period mismatch -> unverifiable"
+  },
+  "JYOTHYLAB|20190331": {
+   "sym": "JYOTHYLAB",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual-only"
+  },
+  "BALAMINES|20190331": {
+   "sym": "BALAMINES",
+   "qe": 20190331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "JISLJALEQS|20190331": {
+   "sym": "JISLJALEQS",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "JISLJALEQS|20190630": {
+   "sym": "JISLJALEQS",
+   "qe": 20190630,
+   "reason": "annual_only_consolidated",
+   "note": "skip: annual-only-con / insurer / distressed-prose / wrong-period / anchor-irreconcilable"
+  },
+  "METROBRAND|20210630": {
+   "sym": "METROBRAND",
+   "qe": 20210630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "COFFEEDAY|20190630": {
+   "sym": "COFFEEDAY",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "COFFEEDAY|20190930": {
+   "sym": "COFFEEDAY",
+   "qe": 20190930,
+   "reason": "wrong_period_filing_only",
+   "note": "reattempt-skip: delay-notice wrong-period"
+  },
+  "COFFEEDAY|20191231": {
+   "sym": "COFFEEDAY",
+   "qe": 20191231,
+   "reason": "wrong_period_filing_only",
+   "note": "reattempt-skip: delay-notice wrong-period"
+  },
+  "COFFEEDAY|20200331": {
+   "sym": "COFFEEDAY",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "COFFEEDAY|20200630": {
+   "sym": "COFFEEDAY",
+   "qe": 20200630,
+   "reason": "annual_only_consolidated",
+   "note": "skip: annual-only-con / insurer / distressed-prose / wrong-period / anchor-irreconcilable"
+  },
+  "COFFEEDAY|20200930": {
+   "sym": "COFFEEDAY",
+   "qe": 20200930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "RATNAMANI|20190331": {
+   "sym": "RATNAMANI",
+   "qe": 20190331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "RATNAMANI|20190630": {
+   "sym": "RATNAMANI",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "JKPAPER|20190331": {
+   "sym": "JKPAPER",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "skip: annual-only-con / insurer / distressed-prose / wrong-period / anchor-irreconcilable"
+  },
+  "JKPAPER|20190630": {
+   "sym": "JKPAPER",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "LUMAXIND|20190630": {
+   "sym": "LUMAXIND",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "POONAWALLA|20190331": {
+   "sym": "POONAWALLA",
+   "qe": 20190331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "POONAWALLA|20190630": {
+   "sym": "POONAWALLA",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SBILIFE|20230930": {
+   "sym": "SBILIFE",
+   "qe": 20230930,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only; not on BSE; NSE 403-blocked"
+  },
+  "HDFCLIFE|20200331": {
+   "sym": "HDFCLIFE",
+   "qe": 20200331,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "prev Dec-2019 251.09 not a column in Q4 filing (shows Mar-2020/Mar-2019/FY); no anchor"
+  },
+  "HDFCLIFE|20200630": {
+   "sym": "HDFCLIFE",
+   "qe": 20200630,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only filer; not on BSE; NSE API 403-blocked -> unfetchable"
+  },
+  "JINDALSAW|20190331": {
+   "sym": "JINDALSAW",
+   "qe": 20190331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GALLANTT|20220331": {
+   "sym": "GALLANTT",
+   "qe": 20220331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "INDOSTAR|20220331": {
+   "sym": "INDOSTAR",
+   "qe": 20220331,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "IRB|20190630": {
+   "sym": "IRB",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "CHOLAFIN|20190331": {
+   "sym": "CHOLAFIN",
+   "qe": 20190331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "RBLBANK|20190930": {
+   "sym": "RBLBANK",
+   "qe": 20190930,
+   "reason": "other_unverifiable",
+   "note": "reattempt-skip: investor-deck rounded only"
+  },
+  "ICICIBANK|20190930": {
+   "sym": "ICICIBANK",
+   "qe": 20190930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ICICIBANK|20220930": {
+   "sym": "ICICIBANK",
+   "qe": 20220930,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: stored neighbors absent in filing; basis mismatch"
+  },
+  "J&KBANK|20190930": {
+   "sym": "J&KBANK",
+   "qe": 20190930,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "J&KBANK|20210630": {
+   "sym": "J&KBANK",
+   "qe": 20210630,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "ANURAS|20201231": {
+   "sym": "ANURAS",
+   "qe": 20201231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "MMTC|20210331": {
+   "sym": "MMTC",
+   "qe": 20210331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "MMTC|20220630": {
+   "sym": "MMTC",
+   "qe": 20220630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "wave1-skip: waiver-letter only"
+  },
+  "SUPREMEINF|20240930": {
+   "sym": "SUPREMEINF",
+   "qe": 20240930,
+   "reason": "wrong_period_filing_only",
+   "note": "reattempt-skip: wrong-period (Jun-2024 filing)"
+  },
+  "SUPREMEINF|20241231": {
+   "sym": "SUPREMEINF",
+   "qe": 20241231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUPREMEINF|20250331": {
+   "sym": "SUPREMEINF",
+   "qe": 20250331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SUPREMEINF|20250630": {
+   "sym": "SUPREMEINF",
+   "qe": 20250630,
+   "reason": "wrong_period_filing_only",
+   "note": "wave1-skip: wrong-period (FY25 annual)"
+  },
+  "BASF|20210630": {
+   "sym": "BASF",
+   "qe": 20210630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BASF|20220331": {
+   "sym": "BASF",
+   "qe": 20220331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BASF|20220630": {
+   "sym": "BASF",
+   "qe": 20220630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BASF|20220930": {
+   "sym": "BASF",
+   "qe": 20220930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BASF|20221231": {
+   "sym": "BASF",
+   "qe": 20221231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BASF|20230331": {
+   "sym": "BASF",
+   "qe": 20230331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BASF|20230630": {
+   "sym": "BASF",
+   "qe": 20230630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BASF|20230930": {
+   "sym": "BASF",
+   "qe": 20230930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20191231": {
+   "sym": "ABB",
+   "qe": 20191231,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only (restated)"
+  },
+  "ABB|20200331": {
+   "sym": "ABB",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20200630": {
+   "sym": "ABB",
+   "qe": 20200630,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "ABB|20200930": {
+   "sym": "ABB",
+   "qe": 20200930,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "ABB|20201231": {
+   "sym": "ABB",
+   "qe": 20201231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20210331": {
+   "sym": "ABB",
+   "qe": 20210331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20210630": {
+   "sym": "ABB",
+   "qe": 20210630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20210930": {
+   "sym": "ABB",
+   "qe": 20210930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20211231": {
+   "sym": "ABB",
+   "qe": 20211231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20220930": {
+   "sym": "ABB",
+   "qe": 20220930,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "ABB|20221231": {
+   "sym": "ABB",
+   "qe": 20221231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20230331": {
+   "sym": "ABB",
+   "qe": 20230331,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "ABB|20230630": {
+   "sym": "ABB",
+   "qe": 20230630,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only"
+  },
+  "ABB|20230930": {
+   "sym": "ABB",
+   "qe": 20230930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20231231": {
+   "sym": "ABB",
+   "qe": 20231231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20240331": {
+   "sym": "ABB",
+   "qe": 20240331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20240630": {
+   "sym": "ABB",
+   "qe": 20240630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20240930": {
+   "sym": "ABB",
+   "qe": 20240930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20241231": {
+   "sym": "ABB",
+   "qe": 20241231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20250331": {
+   "sym": "ABB",
+   "qe": 20250331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "ABB|20250630": {
+   "sym": "ABB",
+   "qe": 20250630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SBIN|20190331": {
+   "sym": "SBIN",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "SBIN|20190930": {
+   "sym": "SBIN",
+   "qe": 20190930,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "BLUEJET|20240331": {
+   "sym": "BLUEJET",
+   "qe": 20240331,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: standalone-only; prev=9M-cumulative"
+  },
+  "BLUEJET|20240630": {
+   "sym": "BLUEJET",
+   "qe": 20240630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "MASFIN|20200930": {
+   "sym": "MASFIN",
+   "qe": 20200930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "MASFIN|20201231": {
+   "sym": "MASFIN",
+   "qe": 20201231,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "reattempt-skip: yago 55.66 absent (restated)"
+  },
+  "KKCL|20190331": {
+   "sym": "KKCL",
+   "qe": 20190331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "LUXIND|20190331": {
+   "sym": "LUXIND",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "LUXIND|20190630": {
+   "sym": "LUXIND",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PAISALO|20190630": {
+   "sym": "PAISALO",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "PIIND|20190331": {
+   "sym": "PIIND",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "skip: annual-only-con / insurer / distressed-prose / wrong-period / anchor-irreconcilable"
+  },
+  "TORNTPHARM|20220630": {
+   "sym": "TORNTPHARM",
+   "qe": 20220630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GLAND|20200930": {
+   "sym": "GLAND",
+   "qe": 20200930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "GLAND|20201231": {
+   "sym": "GLAND",
+   "qe": 20201231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HSCL|20200331": {
+   "sym": "HSCL",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SPICEJET|20190331": {
+   "sym": "SPICEJET",
+   "qe": 20190331,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: con quarter not reported (std-only)"
+  },
+  "SPICEJET|20200331": {
+   "sym": "SPICEJET",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SPICEJET|20210331": {
+   "sym": "SPICEJET",
+   "qe": 20210331,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: prev absent"
+  },
+  "SPICEJET|20210630": {
+   "sym": "SPICEJET",
+   "qe": 20210630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "SPICEJET|20220331": {
+   "sym": "SPICEJET",
+   "qe": 20220331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "SPICEJET|20220630": {
+   "sym": "SPICEJET",
+   "qe": 20220630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SPICEJET|20220930": {
+   "sym": "SPICEJET",
+   "qe": 20220930,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: yago absent"
+  },
+  "SPICEJET|20221231": {
+   "sym": "SPICEJET",
+   "qe": 20221231,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: yago wrong-sign"
+  },
+  "SPICEJET|20230331": {
+   "sym": "SPICEJET",
+   "qe": 20230331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SPICEJET|20231231": {
+   "sym": "SPICEJET",
+   "qe": 20231231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SPICEJET|20240930": {
+   "sym": "SPICEJET",
+   "qe": 20240930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SPICEJET|20241231": {
+   "sym": "SPICEJET",
+   "qe": 20241231,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "fresh-skip: no-neighbor/insurer/distressed/IPO-prospectus/cover-letter"
+  },
+  "SUNTECK|20210331": {
+   "sym": "SUNTECK",
+   "qe": 20210331,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: neighbors no exact match"
+  },
+  "TREEHOUSE|20190331": {
+   "sym": "TREEHOUSE",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual-only"
+  },
+  "TREEHOUSE|20190630": {
+   "sym": "TREEHOUSE",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "KTKBANK|20210630": {
+   "sym": "KTKBANK",
+   "qe": 20210630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "BAJAJHLDNG|20190630": {
+   "sym": "BAJAJHLDNG",
+   "qe": 20190630,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: prev 8.0 absent (erroneous)"
+  },
+  "MPSLTD|20190630": {
+   "sym": "MPSLTD",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "CENTRALBK|20190930": {
+   "sym": "CENTRALBK",
+   "qe": 20190930,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "CENTRALBK|20191231": {
+   "sym": "CENTRALBK",
+   "qe": 20191231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HDBFS|20240930": {
+   "sym": "HDBFS",
+   "qe": 20240930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "HDBFS|20241231": {
+   "sym": "HDBFS",
+   "qe": 20241231,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "SAPPHIRE|20220930": {
+   "sym": "SAPPHIRE",
+   "qe": 20220930,
+   "reason": "other_unverifiable",
+   "note": "reattempt-skip: investor-deck not filed P&L"
+  },
+  "WELCORP|20211231": {
+   "sym": "WELCORP",
+   "qe": 20211231,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "reattempt-skip: total-vs-owners anchor conflict"
+  },
+  "PFOCUS|20200331": {
+   "sym": "PFOCUS",
+   "qe": 20200331,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "DHANUKA|20190630": {
+   "sym": "DHANUKA",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "STARHEALTH|20220630": {
+   "sym": "STARHEALTH",
+   "qe": 20220630,
+   "reason": "no_anchor_or_basis_conflict",
+   "note": "prev Mar-2022 -82.04 not a column in Q1 filing; no yago; no clean anchor"
+  },
+  "STARHEALTH|20220930": {
+   "sym": "STARHEALTH",
+   "qe": 20220930,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only; not on BSE; NSE 403-blocked"
+  },
+  "STARHEALTH|20230630": {
+   "sym": "STARHEALTH",
+   "qe": 20230630,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only; not on BSE; NSE 403-blocked"
+  },
+  "STARHEALTH|20250930": {
+   "sym": "STARHEALTH",
+   "qe": 20250930,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only; not on BSE; NSE 403-blocked"
+  },
+  "BLISSGVS|20211231": {
+   "sym": "BLISSGVS",
+   "qe": 20211231,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "CANBK|20200630": {
+   "sym": "CANBK",
+   "qe": 20200630,
+   "reason": "standalone_only_or_not_published",
+   "note": "reattempt-skip: no con prepared (note 17)"
+  },
+  "HCL-INSYS|20190331": {
+   "sym": "HCL-INSYS",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "HCL-INSYS|20190630": {
+   "sym": "HCL-INSYS",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "CAPLIPOINT|20190630": {
+   "sym": "CAPLIPOINT",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "LICI|20230630": {
+   "sym": "LICI",
+   "qe": 20230630,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only; not on BSE; NSE 403-blocked"
+  },
+  "LICI|20250331": {
+   "sym": "LICI",
+   "qe": 20250331,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only; not on BSE; NSE 403-blocked"
+  },
+  "LICI|20250630": {
+   "sym": "LICI",
+   "qe": 20250630,
+   "reason": "nse_only_not_on_bse",
+   "note": "NSE-only; not on BSE; NSE 403-blocked"
+  },
+  "ZYDUSWELL|20190331": {
+   "sym": "ZYDUSWELL",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "ZYDUSWELL|20190630": {
+   "sym": "ZYDUSWELL",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "DHAMPURSUG|20190630": {
+   "sym": "DHAMPURSUG",
+   "qe": 20190630,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "AGARWALEYE|20240930": {
+   "sym": "AGARWALEYE",
+   "qe": 20240930,
+   "reason": "no_consolidated_filing_on_bse",
+   "note": "nopdf"
+  },
+  "IDFCFIRSTB|20190930": {
+   "sym": "IDFCFIRSTB",
+   "qe": 20190930,
+   "reason": "annual_only_consolidated",
+   "note": "w3-skip: standalone-only/insurer/annual-only/distressed/wrong-period/no-anchor"
+  },
+  "CDSL|20220630": {
+   "sym": "CDSL",
+   "qe": 20220630,
+   "reason": "distressed_or_restructured_or_nonfiling",
+   "note": "nocode/defunct"
+  },
+  "TITAGARH|20190331": {
+   "sym": "TITAGARH",
+   "qe": 20190331,
+   "reason": "annual_only_consolidated",
+   "note": "reattempt-skip: con annual-only"
+  },
+  "TITAGARH|20221231": {
+   "sym": "TITAGARH",
+   "qe": 20221231,
+   "reason": "wrong_period_filing_only",
+   "note": "reattempt-skip: wrong-period (FY23 annual)"
+  }
+ }
+}

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STOCKSWORLD · FII/DII</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="./theme.css" />
+<script src="./theme.js"></script>
+<style>
+  body { font-feature-settings: "tnum" 1; }
+  .pos{color:#15803d;font-weight:600} .neg{color:#b91c1c;font-weight:600}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:.75rem}
+  th[data-s]{cursor:pointer;user-select:none}
+  th[data-s]:hover{color:#2563eb}
+  .tab.active{border-color:#2563eb;color:#1e40af;font-weight:700}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+  <div class="max-w-screen-lg mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <a href="./nse-bse-dashboard.html" class="flex items-center gap-2.5 shrink-0 group">
+      <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-white flex items-center justify-center font-extrabold text-[13px] shadow-md group-hover:scale-105 transition">SW</span>
+      <span class="font-bold text-slate-900 tracking-tight hidden sm:block">STOCKS<span class="text-indigo-600">WORLD</span></span>
+    </a>
+    <nav class="flex items-center gap-1 overflow-x-auto">
+      <a href="./nse-bse-dashboard.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">📈<span class="hidden sm:inline">Stocks</span></a>
+      <a href="https://dhruvan246.github.io/fno-dashboard/" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">🎯<span class="hidden sm:inline">F&amp;O</span></a>
+      <a href="./mutual-funds.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">💰<span class="hidden sm:inline">Mutual&nbsp;Funds</span></a>
+      <a href="./fii-dii.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow transition">🌐<span class="hidden sm:inline">FII/DII</span></a>
+      <a href="./stock-backtest.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition shrink-0">🧪<span class="hidden sm:inline">Backtest</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-screen-lg mx-auto px-4 py-6">
+  <div id="status" class="text-sm text-slate-500">Loading FII/DII data…</div>
+
+  <div id="content" class="hidden">
+    <div class="flex flex-wrap gap-1 border-b border-slate-200 mb-4 text-sm">
+      <button class="tab active px-3 py-2 border-b-2 border-transparent" data-tab="cash">Cash segment</button>
+      <button class="tab px-3 py-2 border-b-2 border-transparent" data-tab="fo">F&amp;O (derivatives)</button>
+    </div>
+
+    <!-- ===================== CASH ===================== -->
+    <section id="pane-cash">
+      <div id="cards" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5"></div>
+      <div class="card p-4 mb-4">
+        <div class="text-sm font-semibold text-slate-700 mb-2">Daily net flow — <span class="text-blue-700">FII</span> vs <span class="text-amber-600">DII</span> <span class="text-slate-400 font-normal">(bars, ₹cr)</span> &amp; <span class="text-slate-500">Nifty 50</span> <span class="text-slate-400 font-normal">(line)</span></div>
+        <div id="chartNet" class="overflow-x-auto"></div>
+      </div>
+      <div class="card p-4 mb-4">
+        <div class="text-sm font-semibold text-slate-700 mb-2">Cumulative net flow over the window — <span class="text-blue-700">FII</span> &amp; <span class="text-amber-600">DII</span></div>
+        <div id="chartCum"></div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm font-semibold text-slate-700 mb-2">Daily table <span class="text-[11px] font-normal text-slate-400">(click a header to sort)</span></div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm" id="tbl">
+            <thead class="text-[11px] uppercase text-slate-500 border-b border-slate-200"><tr>
+              <th data-s="date" class="text-left py-2 px-1">Date</th>
+              <th data-s="fiiBuy" class="text-right px-1">FII buy</th>
+              <th data-s="fiiSell" class="text-right px-1">FII sell</th>
+              <th data-s="fiiNet" class="text-right px-1">FII net</th>
+              <th data-s="diiBuy" class="text-right px-1">DII buy</th>
+              <th data-s="diiSell" class="text-right px-1">DII sell</th>
+              <th data-s="diiNet" class="text-right px-1">DII net</th>
+              <th data-s="nifty" class="text-right px-1">Nifty 50</th>
+              <th data-s="chg" class="text-right px-1">Chg%</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-5">Cash-segment provisional figures (₹ crore). <b>Net</b> = buy − sell; positive = net buying. Buy/sell breakdown shown when available (latest day from NSE). Source: NSE + NiftyTrader.</p>
+    </section>
+
+    <!-- ===================== F&O ===================== -->
+    <section id="pane-fo" class="hidden">
+      <div id="foCards" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5"></div>
+      <div id="foSecBtns" class="flex gap-1 mb-4 text-sm"></div>
+      <div id="foChartsSection">
+      <div class="flex items-center gap-2 mb-3 text-xs">
+        <span class="text-slate-500 font-medium">Chart view:</span>
+        <div id="foViewBtns" class="flex gap-1"></div>
+        <span class="text-slate-400">— overlay = shared plot · split = stacked panes (Nifty on top)</span>
+      </div>
+      <div class="card p-4 mb-4">
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <div class="text-sm font-semibold text-slate-700"><span class="text-red-700">FII Index-Futures net</span> vs <span class="text-amber-600">Nifty 50</span> <span class="text-slate-400 font-normal">(contracts long − short; hover for values)</span></div>
+          <div id="foRangeBtns" class="flex flex-wrap items-center gap-1 text-xs"></div>
+        </div>
+        <div id="foChart"></div>
+      </div>
+      <div class="card p-4 mb-4">
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <div class="text-sm font-semibold text-slate-700"><span class="text-blue-700">FII Long/Short ratio</span> vs <span class="text-amber-600">Nifty 50</span> <span class="text-slate-400 font-normal">(index futures; ratio &lt; 1 = net short — does positioning lead price?)</span></div>
+          <div id="foRatioBtns" class="flex flex-wrap items-center gap-1 text-xs"></div>
+        </div>
+        <div id="foRatioChart"></div>
+      </div>
+      </div><!-- /foChartsSection -->
+      <div id="foTablesSection" class="hidden">
+      <div class="card p-4 mb-4">
+        <div class="text-sm font-semibold text-slate-700 mb-2">FII derivative buy / sell — latest day <span id="foDate1" class="text-slate-400 font-normal"></span> <span class="text-slate-400 font-normal">(₹ crore)</span></div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm"><thead class="text-[11px] uppercase text-slate-500 border-b border-slate-200"><tr>
+            <th class="text-left py-2 px-1">Instrument</th><th class="text-right px-1">Buy</th><th class="text-right px-1">Sell</th><th class="text-right px-1">Net</th></tr></thead>
+            <tbody id="foBS"></tbody></table>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div class="text-sm font-semibold text-slate-700 mb-2">Participant net positions — latest day <span id="foDate2" class="text-slate-400 font-normal"></span> <span class="text-slate-400 font-normal">(no. of contracts)</span></div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm"><thead class="text-[11px] uppercase text-slate-500 border-b border-slate-200"><tr>
+            <th class="text-left py-2 px-1">Participant</th>
+            <th class="text-right px-1">Idx-Fut long</th><th class="text-right px-1">Idx-Fut short</th><th class="text-right px-1">Idx-Fut net</th>
+            <th class="text-right px-1">Stk-Fut net</th><th class="text-right px-1">Total long</th><th class="text-right px-1">Total short</th></tr></thead>
+            <tbody id="foOI"></tbody></table>
+        </div>
+      </div>
+      <div class="card p-4 mt-4">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div class="text-sm font-semibold text-slate-700">Day-wise positions <span class="text-slate-400 font-normal">(open interest, no. of contracts)</span></div>
+          <div class="flex items-center gap-2 text-xs flex-wrap">
+            <label class="flex items-center gap-1 text-slate-600">Participant
+              <select id="foDP" class="border border-slate-300 rounded-md px-2 py-1 bg-white font-semibold text-blue-700">
+                <option value="FII">FII</option><option value="DII">DII</option><option value="Pro">Pro</option><option value="Client">Client</option></select></label>
+            <label class="flex items-center gap-1 text-slate-600">Instrument
+              <select id="foDI" class="border border-slate-300 rounded-md px-2 py-1 bg-white">
+                <option value="futIdx">Index Futures</option><option value="futStk">Stock Futures</option><option value="tot">All (total)</option></select></label>
+            <select id="foDN" class="border border-slate-300 rounded-md px-2 py-1 bg-white">
+              <option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 1 year</option><option value="all">All</option></select>
+          </div>
+        </div>
+        <div class="overflow-x-auto max-h-[28rem] overflow-y-auto rounded-lg border border-slate-100">
+          <table class="w-full text-sm"><thead class="text-[11px] uppercase text-slate-500 border-b border-slate-200 sticky top-0 bg-white"><tr>
+            <th class="text-left py-2 px-3">Date</th>
+            <th class="text-right px-3">Long</th><th class="text-right px-3">Short</th><th class="text-right px-3">Net</th><th class="text-right px-3">Long:Short</th></tr></thead>
+            <tbody id="foDaily"></tbody></table>
+        </div>
+      </div>
+      </div><!-- /foTablesSection -->
+      <p class="text-[11px] text-slate-500 mt-5">F&amp;O participant positions = <b>open interest</b> (no. of contracts). <b>Idx-Fut net</b> = index-futures long − short; a large negative FII number = net short / bearish positioning. Buy/sell table is FII-only derivative turnover value. Source: NSE participant-wise OI + FII derivative-stats reports. <span id="updated"></span></p>
+    </section>
+  </div>
+</main>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const fmt = n => n==null ? '·' : (n<0?'−':'')+Math.abs(Math.round(n)).toLocaleString('en-IN');
+const fmtSigned = n => n==null ? '·' : (n>=0?'+':'−')+Math.abs(Math.round(n)).toLocaleString('en-IN');
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmtDate = d => { const p=d.split('-'); return p[2]+' '+MON[+p[1]-1]+' '+p[0]; };
+let ROWS=[], FO=[], sortKey='date', sortAsc=true, foRange='3y';
+let NIFTY={}, foRatioRange='3y', CHART_STATE={}, foView='split', foSection='charts';
+let foCustom={from:'',to:''}, foRatioCustom={from:'',to:''};
+
+async function load(){
+  let data, fdata={rows:[]};
+  try { data = await (await fetch('./fii_dii.json?t='+Date.now())).json(); }
+  catch(e){ $('status').textContent='Could not load fii_dii.json — has the refresh run yet?'; return; }
+  try { fdata = await (await fetch('./fii_fo.json?t='+Date.now())).json(); } catch(e){}
+  try { NIFTY = (await (await fetch('./nifty.json?t='+Date.now())).json()).px || {}; } catch(e){ NIFTY={}; }
+  ROWS = (data.rows||[]).slice();
+  FO = (fdata.rows||[]).slice();
+  if(!ROWS.length){ $('status').textContent='No FII/DII data yet.'; return; }
+  $('updated').textContent = data.updated ? '· updated '+data.updated.replace('T',' ') : '';
+  $('status').classList.add('hidden'); $('content').classList.remove('hidden');
+  renderCards(); renderNetChart(); renderCumChart(); renderTable();
+  renderFO();
+}
+
+/* ---------------- CASH ---------------- */
+function renderCards(){
+  const last = ROWS[ROWS.length-1];
+  const cumF = ROWS.reduce((s,r)=>s+(r.fiiNet||0),0), cumD = ROWS.reduce((s,r)=>s+(r.diiNet||0),0);
+  const card=(t,v,sub,cls)=>`<div class="card p-3"><div class="text-[10px] uppercase text-slate-500">${t}</div><div class="text-lg font-bold ${cls||''}">${v}</div><div class="text-[11px] text-slate-400">${sub||''}</div></div>`;
+  $('cards').innerHTML =
+    card('FII net · '+last.date, fmtSigned(last.fiiNet)+' cr', last.fiiBuy!=null?('buy '+fmt(last.fiiBuy)+' / sell '+fmt(last.fiiSell)):'', (last.fiiNet||0)>=0?'pos':'neg')
+   +card('DII net · '+last.date, fmtSigned(last.diiNet)+' cr', last.diiBuy!=null?('buy '+fmt(last.diiBuy)+' / sell '+fmt(last.diiSell)):'', (last.diiNet||0)>=0?'pos':'neg')
+   +card('FII — last '+ROWS.length+' days', fmtSigned(cumF)+' cr', 'cumulative net', cumF>=0?'pos':'neg')
+   +card('DII — last '+ROWS.length+' days', fmtSigned(cumD)+' cr', 'cumulative net', cumD>=0?'pos':'neg');
+}
+function renderNetChart(){
+  const r=ROWS, n=r.length;
+  const W=Math.max(720, n*22), H=300, PL=52, PR=52, PT=14, PB=46;
+  const maxA=Math.max(1000, ...r.flatMap(x=>[Math.abs(x.fiiNet||0),Math.abs(x.diiNet||0)]));
+  const nv=r.map(x=>x.nifty).filter(v=>v!=null); const nMin=Math.min(...nv),nMax=Math.max(...nv);
+  const bw=(W-PL-PR)/n, slot=bw*0.36, y0=PT+(H-PT-PB)/2;
+  const yBar=v=>y0-(v/maxA)*((H-PT-PB)/2), xC=i=>PL+bw*(i+0.5), yN=v=>PT+(H-PT-PB)*(1-(v-nMin)/((nMax-nMin)||1));
+  let bars='';
+  r.forEach((x,i)=>{const cx=xC(i),f=x.fiiNet||0,d=x.diiNet||0;
+    bars+=`<rect x="${(cx-slot-1).toFixed(1)}" y="${Math.min(y0,yBar(f)).toFixed(1)}" width="${slot.toFixed(1)}" height="${Math.abs(yBar(f)-y0).toFixed(1)}" fill="${f>=0?'#2563eb':'#93c5fd'}"/>`;
+    bars+=`<rect x="${(cx+1).toFixed(1)}" y="${Math.min(y0,yBar(d)).toFixed(1)}" width="${slot.toFixed(1)}" height="${Math.abs(yBar(d)-y0).toFixed(1)}" fill="${d>=0?'#d97706':'#fcd34d'}"/>`;});
+  let np=''; r.forEach((x,i)=>{ if(x.nifty==null)return; np+=(np?'L':'M')+xC(i).toFixed(1)+' '+yN(x.nifty).toFixed(1)+' ';});
+  let xl=''; const step=Math.ceil(n/12);
+  r.forEach((x,i)=>{ if(i%step)return; xl+=`<text x="${xC(i).toFixed(1)}" y="${H-PB+16}" font-size="9" fill="#94a3b8" text-anchor="middle" transform="rotate(35 ${xC(i).toFixed(1)} ${H-PB+16})">${x.date.slice(5)}</text>`;});
+  let yl=''; for(let k=-1;k<=1;k++){const v=k*maxA,yy=yBar(v);yl+=`<line x1="${PL}" y1="${yy.toFixed(1)}" x2="${W-PR}" y2="${yy.toFixed(1)}" stroke="${k===0?'#cbd5e1':'#f1f5f9'}"/><text x="${PL-4}" y="${(yy+3).toFixed(1)}" font-size="9" fill="#94a3b8" text-anchor="end">${fmtSigned(v)}</text>`;}
+  let yr=''; for(let k=0;k<=2;k++){const v=nMin+(nMax-nMin)*k/2,yy=yN(v);yr+=`<text x="${W-PR+4}" y="${(yy+3).toFixed(1)}" font-size="9" fill="#94a3b8" text-anchor="start">${Math.round(v).toLocaleString('en-IN')}</text>`;}
+  $('chartNet').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${yl}${yr}${xl}${bars}<path d="${np}" fill="none" stroke="#64748b" stroke-width="1.6"/></svg>`;
+}
+function renderCumChart(){
+  const r=ROWS,n=r.length,W=720,H=200,PL=54,PR=14,PT=12,PB=28;
+  let cf=0,cd=0;const F=[],D=[];r.forEach(x=>{cf+=x.fiiNet||0;cd+=x.diiNet||0;F.push(cf);D.push(cd);});
+  const all=F.concat(D),mn=Math.min(0,...all),mx=Math.max(0,...all);
+  const x=i=>PL+(W-PL-PR)*(n<=1?0:i/(n-1)), y=v=>PT+(H-PT-PB)*(1-(v-mn)/((mx-mn)||1));
+  const path=A=>A.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');
+  let yl='';for(let k=0;k<=3;k++){const v=mn+(mx-mn)*k/3,yy=y(v);yl+=`<line x1="${PL}" y1="${yy.toFixed(1)}" x2="${W-PR}" y2="${yy.toFixed(1)}" stroke="${Math.abs(v)<1?'#cbd5e1':'#f1f5f9'}"/><text x="${PL-4}" y="${(yy+3).toFixed(1)}" font-size="9" fill="#94a3b8" text-anchor="end">${fmtSigned(v)}</text>`;}
+  $('chartCum').innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="w-full">${yl}<path d="${path(F)}" fill="none" stroke="#2563eb" stroke-width="2"/><path d="${path(D)}" fill="none" stroke="#d97706" stroke-width="2"/></svg>`;
+}
+function renderTable(){
+  const r=ROWS.slice().sort((a,b)=>{const A=a[sortKey],B=b[sortKey];let c;if(sortKey==='date')c=(A<B?-1:A>B?1:0);else c=(A||0)-(B||0);return sortAsc?c:-c;});
+  $('tbody').innerHTML=r.map(x=>`<tr class="border-b border-slate-50">
+     <td class="py-1 px-1 font-medium">${x.date}</td>
+     <td class="text-right px-1 text-slate-500">${fmt(x.fiiBuy)}</td><td class="text-right px-1 text-slate-500">${fmt(x.fiiSell)}</td>
+     <td class="text-right px-1 ${(x.fiiNet||0)>=0?'pos':'neg'}">${fmtSigned(x.fiiNet)}</td>
+     <td class="text-right px-1 text-slate-500">${fmt(x.diiBuy)}</td><td class="text-right px-1 text-slate-500">${fmt(x.diiSell)}</td>
+     <td class="text-right px-1 ${(x.diiNet||0)>=0?'pos':'neg'}">${fmtSigned(x.diiNet)}</td>
+     <td class="text-right px-1">${x.nifty!=null?x.nifty.toLocaleString('en-IN'):'·'}</td>
+     <td class="text-right px-1 ${(x.chg||0)>=0?'pos':'neg'}">${x.chg!=null?(x.chg>=0?'+':'')+x.chg.toFixed(2)+'%':'·'}</td></tr>`).join('');
+}
+document.querySelectorAll('th[data-s]').forEach(th=>th.addEventListener('click',()=>{
+  const k=th.dataset.s; if(sortKey===k)sortAsc=!sortAsc; else {sortKey=k;sortAsc=(k==='date');} renderTable();}));
+
+/* ---------------- F&O ---------------- */
+const RANGES={'1y':365,'3y':1095,'5y':1825,'all':1e9};
+function dMinus(dstr, months){const d=new Date(dstr+'T00:00:00'); d.setMonth(d.getMonth()-months); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function filterRange(arr, rng, custom){
+  if(rng==='custom') return arr.filter(p=>(!custom.from||p.d>=custom.from)&&(!custom.to||p.d<=custom.to));
+  const cut=RANGES[rng]; if(cut>=1e9) return arr;
+  const last=arr.length?new Date(arr[arr.length-1].d):new Date();
+  return arr.filter(p=>(last-new Date(p.d))/864e5<=cut);
+}
+function rangeUI(elId, cur, custom, fromId, toId){
+  const span=FO.length?{min:FO[0].date,max:FO[FO.length-1].date}:{min:'',max:''};
+  $(elId).innerHTML = ['1y','3y','5y','all','custom'].map(k=>`<button data-r="${k}" class="px-2 py-1 rounded ${cur===k?'bg-blue-600 text-white':'bg-slate-100 text-slate-600'}">${k==='custom'?'Custom':k.toUpperCase()}</button>`).join('')
+    + (cur==='custom'?`<input type="date" id="${fromId}" value="${custom.from||''}" min="${span.min}" max="${span.max}" class="border border-slate-300 rounded px-1.5 py-0.5 text-[11px]"/><span class="text-slate-400 text-[11px]">→</span><input type="date" id="${toId}" value="${custom.to||''}" min="${span.min}" max="${span.max}" class="border border-slate-300 rounded px-1.5 py-0.5 text-[11px]"/>`:'');
+}
+function renderFO(){
+  if(!FO.length){ $('foCards').innerHTML='<div class="text-xs text-slate-400 col-span-4">No F&O data yet — the next refresh will add it.</div>'; return; }
+  const last = FO[FO.length-1];
+  const oi=last.oi||{};
+  const lastBS = [...FO].reverse().find(r=>r.bs);          // newest row that has buy/sell value
+  const bs = lastBS ? lastBS.bs : {};
+  const fiiIdx = oi.FII ? oi.FII.futIdx : null;
+  const fiiIdxNet = fiiIdx ? fiiIdx[0]-fiiIdx[1] : null;
+  const ratio = fiiIdx && fiiIdx[1] ? (fiiIdx[0]/fiiIdx[1]) : null;
+  const diiIdxNet = oi.DII ? oi.DII.futIdx[0]-oi.DII.futIdx[1] : null;
+  const bsNetTotal = ['idxFut','idxOpt','stkFut','stkOpt'].reduce((s,k)=>s+(bs[k]?bs[k][0]-bs[k][1]:0),0);
+  const card=(t,v,sub,cls)=>`<div class="card p-3"><div class="text-[10px] uppercase text-slate-500">${t}</div><div class="text-lg font-bold ${cls||''}">${v}</div><div class="text-[11px] text-slate-400">${sub||''}</div></div>`;
+  $('foCards').innerHTML =
+    card('FII Index-Fut net · '+last.date, fmtSigned(fiiIdxNet), fiiIdx?('long '+fmt(fiiIdx[0])+' / short '+fmt(fiiIdx[1])):'', (fiiIdxNet||0)>=0?'pos':'neg')
+   +card('FII long/short ratio', ratio!=null?ratio.toFixed(2):'·', ratio!=null?(ratio<1?'net short (bearish)':'net long (bullish)'):'', (ratio||0)>=1?'pos':'neg')
+   +card('FII F&O net turnover · '+(lastBS?lastBS.date:''), fmtSigned(bsNetTotal)+' cr', 'buy − sell, all instruments', bsNetTotal>=0?'pos':'neg')
+   +card('DII Index-Fut net', fmtSigned(diiIdxNet), 'contracts', (diiIdxNet||0)>=0?'pos':'neg');
+
+  // section toggle (charts / tables) — show one group at a time to keep the page short
+  $('foSecBtns').innerHTML = [['charts','📈 Charts'],['tables','📋 Tables']].map(([k,lbl])=>`<button data-sec="${k}" class="px-3 py-1.5 rounded-lg font-semibold transition ${foSection===k?'bg-slate-800 text-white shadow':'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${lbl}</button>`).join('');
+  $('foSecBtns').querySelectorAll('button').forEach(b=>b.onclick=()=>{foSection=b.dataset.sec; renderFO();});
+  $('foChartsSection').classList.toggle('hidden', foSection!=='charts');
+  $('foTablesSection').classList.toggle('hidden', foSection!=='tables');
+
+  // view toggle (overlay / split) — applies to both charts
+  $('foViewBtns').innerHTML = [['overlay','Overlay'],['split','Split']].map(([k,lbl])=>`<button data-v="${k}" class="px-2.5 py-1 rounded font-semibold ${foView===k?'bg-blue-600 text-white':'bg-slate-100 text-slate-600'}">${lbl}</button>`).join('');
+  $('foViewBtns').querySelectorAll('button').forEach(b=>b.onclick=()=>{foView=b.dataset.v; renderFO();});
+
+  // chart 1: FII index-fut net position + Nifty overlay (with range + custom dates)
+  rangeUI('foRangeBtns', foRange, foCustom, 'foFrom', 'foTo');
+  $('foRangeBtns').querySelectorAll('button').forEach(b=>b.onclick=()=>{foRange=b.dataset.r; if(foRange==='custom'&&!foCustom.from){const ld=FO[FO.length-1].date; foCustom.from=dMinus(ld,6); foCustom.to=ld;} renderFO();});
+  if(foRange==='custom'){ $('foFrom').onchange=e=>{foCustom.from=e.target.value; renderFO();}; $('foTo').onchange=e=>{foCustom.to=e.target.value; renderFO();}; }
+  let series = filterRange(FO.map(r=>({d:r.date, v: r.oi&&r.oi.FII ? r.oi.FII.futIdx[0]-r.oi.FII.futIdx[1] : null})).filter(p=>p.v!=null), foRange, foCustom);
+  $('foChart').innerHTML = dualChart('foChart', series, {baseline:true, color:'#b91c1c', areaFill:'#fee2e2', label:'FII net', fmt:fmtSigned, unit:'contracts'});
+  attachHover('foChart');
+
+  // chart 2: FII long/short ratio + Nifty overlay (with range + custom dates)
+  rangeUI('foRatioBtns', foRatioRange, foRatioCustom, 'foRatioFrom', 'foRatioTo');
+  $('foRatioBtns').querySelectorAll('button').forEach(b=>b.onclick=()=>{foRatioRange=b.dataset.r; if(foRatioRange==='custom'&&!foRatioCustom.from){const ld=FO[FO.length-1].date; foRatioCustom.from=dMinus(ld,6); foRatioCustom.to=ld;} renderFO();});
+  if(foRatioRange==='custom'){ $('foRatioFrom').onchange=e=>{foRatioCustom.from=e.target.value; renderFO();}; $('foRatioTo').onchange=e=>{foRatioCustom.to=e.target.value; renderFO();}; }
+  let rseries = filterRange(FO.map(r=>{const f=r.oi&&r.oi.FII?r.oi.FII.futIdx:null; return {d:r.date, v: (f&&f[1])? f[0]/f[1] : null};}).filter(p=>p.v!=null), foRatioRange, foRatioCustom);
+  $('foRatioChart').innerHTML = dualChart('foRatioChart', rseries, {baseline:false, color:'#2563eb', label:'L/S ratio', fmt:v=>v.toFixed(2), unit:''});
+  attachHover('foRatioChart');
+
+  // buy/sell table (latest day that has values)
+  $('foDate1').textContent = '('+(lastBS?lastBS.date:'n/a')+')';
+  const names={idxFut:'Index Futures',idxOpt:'Index Options',stkFut:'Stock Futures',stkOpt:'Stock Options'};
+  $('foBS').innerHTML = ['idxFut','idxOpt','stkFut','stkOpt'].map(k=>{const b=bs[k];if(!b)return '';const net=b[0]-b[1];
+    return `<tr class="border-b border-slate-50"><td class="py-1 px-1 font-medium">${names[k]}</td>
+      <td class="text-right px-1 text-slate-500">${fmt(b[0])}</td><td class="text-right px-1 text-slate-500">${fmt(b[1])}</td>
+      <td class="text-right px-1 ${net>=0?'pos':'neg'}">${fmtSigned(net)}</td></tr>`;}).join('');
+
+  // participant OI table (latest day)
+  $('foDate2').textContent = '('+last.date+')';
+  $('foOI').innerHTML = ['FII','DII','Pro','Client'].map(p=>{const o=oi[p];if(!o)return '';
+    const idxNet=o.futIdx[0]-o.futIdx[1], stkNet=o.futStk[0]-o.futStk[1];
+    return `<tr class="border-b border-slate-50"><td class="py-1 px-1 font-medium">${p}</td>
+      <td class="text-right px-1 text-slate-500">${fmt(o.futIdx[0])}</td><td class="text-right px-1 text-slate-500">${fmt(o.futIdx[1])}</td>
+      <td class="text-right px-1 ${idxNet>=0?'pos':'neg'}">${fmtSigned(idxNet)}</td>
+      <td class="text-right px-1 ${stkNet>=0?'pos':'neg'}">${fmtSigned(stkNet)}</td>
+      <td class="text-right px-1 text-slate-500">${fmt(o.totL)}</td><td class="text-right px-1 text-slate-500">${fmt(o.totS)}</td></tr>`;}).join('');
+
+  // day-wise positions table
+  ['foDP','foDI','foDN'].forEach(id=>{const el=$(id); if(el && !el.__wired){el.__wired=true; el.onchange=renderFODaily;}});
+  renderFODaily();
+}
+function renderFODaily(){
+  if(!FO.length) return;
+  const p=$('foDP').value, inst=$('foDI').value, nv=$('foDN').value;
+  const rows=FO.filter(r=>r.oi&&r.oi[p]).slice().reverse();   // newest first
+  const sel=(nv==='all')?rows:rows.slice(0, +nv);
+  $('foDaily').innerHTML = sel.map(r=>{const o=r.oi[p]; let L,S;
+    if(inst==='futStk'){L=o.futStk[0];S=o.futStk[1];}
+    else if(inst==='tot'){L=o.totL;S=o.totS;}
+    else {L=o.futIdx[0];S=o.futIdx[1];}
+    const net=L-S, tot=L+S, lp = tot? Math.round(L/tot*100) : null;
+    const ratio = lp==null ? '·' : `<span class="${lp>=50?'pos':'text-slate-500'}">${lp}</span>:<span class="${lp<50?'neg':'text-slate-500'}">${100-lp}</span>`;
+    return `<tr class="border-b border-slate-50 hover:bg-slate-50"><td class="py-1.5 px-3 font-medium text-slate-700">${fmtDate(r.date)}</td>
+      <td class="text-right px-3 text-slate-600">${fmt(L)}</td><td class="text-right px-3 text-slate-600">${fmt(S)}</td>
+      <td class="text-right px-3 font-semibold ${net>=0?'pos':'neg'}">${fmtSigned(net)}</td>
+      <td class="text-right px-3 font-medium tabular-nums">${ratio}</td></tr>`;}).join('')
+    || '<tr><td colspan="5" class="py-3 px-3 text-slate-400 text-xs">No data for this selection.</td></tr>';
+}
+// Dual chart with two view modes (foView): 'overlay' = primary + Nifty on one plot (dual axes);
+// 'split' = TradingView-style stacked panes (Nifty on top, primary below), shared time axis.
+// opts: {baseline:bool (zero area), color, areaFill, label, fmt, unit}
+const NIFTY_COLOR='#f59e0b';
+function dualChart(cid, series, opts){
+  const n=series.length;
+  if(!n) return '<div class="text-xs text-slate-400 py-8 text-center">No data in this range.</div>';
+  const split = foView==='split';
+  const W=720, H=split?300:240, PL=58, PR=58, PT=14, PB=30;
+  const x=i=>PL+(W-PL-PR)*(n<=1?0:i/(n-1));
+  const vs=series.map(p=>p.v); let mn=Math.min(...vs),mx=Math.max(...vs);
+  if(opts.baseline){ mn=Math.min(0,mn); mx=Math.max(0,mx); }
+  if(mn===mx) mx=mn+1;
+  const nv=series.map(p=>NIFTY[p.d]).filter(v=>v!=null);
+  const nMn=nv.length?Math.min(...nv):0, nMx=nv.length?Math.max(...nv):1;
+  let y, yN, grid='';
+  if(split){
+    const gap=22, avail=H-PT-PB-gap, topH=avail*0.52;
+    const topY0=PT, topY1=PT+topH, botY0=topY1+gap, botY1=H-PB;
+    yN=v=>topY1-(v-nMn)/((nMx-nMn)||1)*(topY1-topY0);
+    y =v=>botY1-(v-mn)/((mx-mn)||1)*(botY1-botY0);
+    for(let k=0;k<=2;k++){const v=nMn+(nMx-nMn)*k/2,yy=yN(v);grid+=`<line x1="${PL}" y1="${yy.toFixed(1)}" x2="${W-PR}" y2="${yy.toFixed(1)}" stroke="#f1f5f9"/><text x="${W-PR+4}" y="${(yy+3).toFixed(1)}" font-size="9" fill="${NIFTY_COLOR}" text-anchor="start">${Math.round(v).toLocaleString('en-IN')}</text>`;}
+    for(let k=0;k<=3;k++){const v=mn+(mx-mn)*k/3,yy=y(v);grid+=`<line x1="${PL}" y1="${yy.toFixed(1)}" x2="${W-PR}" y2="${yy.toFixed(1)}" stroke="${opts.baseline&&Math.abs(v)<1e-6?'#cbd5e1':'#f1f5f9'}"/><text x="${PL-4}" y="${(yy+3).toFixed(1)}" font-size="9" fill="${opts.color}" text-anchor="end">${opts.fmt(v)}</text>`;}
+    grid+=`<text x="${PL}" y="${(topY0+9).toFixed(1)}" font-size="9" font-weight="600" fill="${NIFTY_COLOR}">NIFTY 50</text><text x="${PL}" y="${(botY0+9).toFixed(1)}" font-size="9" font-weight="600" fill="${opts.color}">${opts.label}</text>`;
+  } else {
+    y =v=>PT+(H-PT-PB)*(1-(v-mn)/((mx-mn)||1));
+    yN=v=>PT+(H-PT-PB)*(1-(v-nMn)/((nMx-nMn)||1));
+    for(let k=0;k<=3;k++){const v=mn+(mx-mn)*k/3,yy=y(v);grid+=`<line x1="${PL}" y1="${yy.toFixed(1)}" x2="${W-PR}" y2="${yy.toFixed(1)}" stroke="${opts.baseline&&Math.abs(v)<1e-6?'#cbd5e1':'#f1f5f9'}"/><text x="${PL-4}" y="${(yy+3).toFixed(1)}" font-size="9" fill="${opts.color}" text-anchor="end">${opts.fmt(v)}</text>`;}
+    for(let k=0;k<=3;k++){const v=nMn+(nMx-nMn)*k/3,yy=yN(v);grid+=`<text x="${W-PR+4}" y="${(yy+3).toFixed(1)}" font-size="9" fill="${NIFTY_COLOR}" text-anchor="start">${Math.round(v).toLocaleString('en-IN')}</text>`;}
+  }
+  let area='';
+  if(opts.baseline){ const yb=y(0); area=`<path d="M ${x(0).toFixed(1)} ${yb.toFixed(1)} `+series.map((p,i)=>'L'+x(i).toFixed(1)+' '+y(p.v).toFixed(1)).join(' ')+` L ${x(n-1).toFixed(1)} ${yb.toFixed(1)} Z" fill="${opts.areaFill||'#fee2e2'}" opacity="0.45"/>`; }
+  const ppath=series.map((p,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(p.v).toFixed(1)).join(' ');
+  let npath=''; series.forEach((p,i)=>{const v=NIFTY[p.d]; if(v==null)return; npath+=(npath?'L':'M')+x(i).toFixed(1)+' '+yN(v).toFixed(1)+' ';});
+  let xl=''; const step=Math.ceil(n/10);
+  series.forEach((p,i)=>{if(i%step)return; xl+=`<text x="${x(i).toFixed(1)}" y="${H-8}" font-size="9" fill="#94a3b8" text-anchor="middle">${p.d.slice(2,7)}</text>`;});
+  CHART_STATE[cid]={pts:series.map((p,i)=>({px:x(i),py:y(p.v),pyN:NIFTY[p.d]!=null?yN(NIFTY[p.d]):null,v:p.v,d:p.d,nifty:NIFTY[p.d]})), W,H, label:opts.label, fmt:opts.fmt, unit:opts.unit||'', color:opts.color};
+  const cross=`<line class="cx" x1="0" x2="0" y1="${PT}" y2="${H-PB}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" style="display:none"/>`;
+  const dot=`<circle class="dt" r="4" fill="${opts.color}" stroke="#fff" stroke-width="1.5" style="display:none"/>`;
+  const dotN=`<circle class="dtN" r="3.5" fill="${NIFTY_COLOR}" stroke="#fff" stroke-width="1.5" style="display:none"/>`;
+  const overlay=`<rect x="${PL}" y="${PT}" width="${(W-PL-PR).toFixed(1)}" height="${(H-PT-PB).toFixed(1)}" fill="transparent"/>`;
+  return `<div class="relative">
+    <svg viewBox="0 0 ${W} ${H}" class="w-full block">${grid}${xl}${area}<path d="${npath}" fill="none" stroke="${NIFTY_COLOR}" stroke-width="1.7"/><path d="${ppath}" fill="none" stroke="${opts.color}" stroke-width="2"/>${cross}${dotN}${dot}${overlay}</svg>
+    <div class="tip absolute hidden pointer-events-none -translate-x-1/2 -translate-y-[135%] bg-slate-800 text-white text-[11px] leading-tight px-2 py-1 rounded-md shadow-lg whitespace-nowrap z-10"></div>
+  </div>`;
+}
+function attachHover(cid){
+  const wrap=document.getElementById(cid); if(!wrap)return;
+  const svg=wrap.querySelector('svg'), st=CHART_STATE[cid]; if(!svg||!st||!st.pts.length)return;
+  const tip=wrap.querySelector('.tip'), cross=wrap.querySelector('.cx'), dot=wrap.querySelector('.dt'), dotN=wrap.querySelector('.dtN');
+  const move=e=>{
+    const r=svg.getBoundingClientRect(); if(!r.width)return;
+    const sx=(e.clientX-r.left)/r.width*st.W;
+    let best=0,bd=1e9; for(let i=0;i<st.pts.length;i++){const d=Math.abs(st.pts[i].px-sx); if(d<bd){bd=d;best=i;}}
+    const p=st.pts[best];
+    cross.setAttribute('x1',p.px); cross.setAttribute('x2',p.px); cross.style.display='';
+    dot.setAttribute('cx',p.px); dot.setAttribute('cy',p.py); dot.style.display='';
+    if(p.pyN!=null){ dotN.setAttribute('cx',p.px); dotN.setAttribute('cy',p.pyN); dotN.style.display=''; } else dotN.style.display='none';
+    tip.style.left=(p.px/st.W*100)+'%'; tip.style.top=(Math.min(p.py,p.pyN==null?p.py:p.pyN)/st.H*100)+'%';
+    tip.innerHTML=`<div class="font-semibold">${fmtDate(p.d)}</div><div><span style="color:${st.color}">●</span> ${st.label}: ${st.fmt(p.v)} ${st.unit}</div>`+(p.nifty!=null?`<div><span style="color:${NIFTY_COLOR}">●</span> Nifty: ${Math.round(p.nifty).toLocaleString('en-IN')}</div>`:'');
+    tip.classList.remove('hidden');
+  };
+  svg.addEventListener('mousemove',move);
+  svg.addEventListener('mouseleave',()=>{tip.classList.add('hidden');cross.style.display='none';dot.style.display='none';dotN.style.display='none';});
+}
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  $('pane-cash').classList.toggle('hidden', t.dataset.tab!=='cash');
+  $('pane-fo').classList.toggle('hidden', t.dataset.tab!=='fo');
+}));
+load();
+</script>
+</body>
+</html>

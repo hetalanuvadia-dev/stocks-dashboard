@@ -1,0 +1,68 @@
+name: Daily backtest-history backup (keep 7 days)
+
+on:
+  schedule:
+    # Best-effort daily ~01:00 IST (19:30 UTC). A missed day is fine — we keep a 7-day window.
+    - cron: "30 19 * * *"
+  # Optional reliable trigger via cron-job.org: POST /repos/dhruvan246/stocks-dashboard/dispatches
+  # with {"event_type":"bt-backup"} (same mechanism as the other refresh workflows).
+  repository_dispatch:
+    types: [bt-backup]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bt-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Snapshot the shared history + strategies (dated) and prune to 7 days
+        run: |
+          set -e
+          mkdir -p backups
+          DAY=$(TZ=Asia/Kolkata date +'%Y-%m-%d')
+          API="https://nebjnsndgrhumnkuipqy.supabase.co/rest/v1"
+          KEY="sb_publishable_MDlQwiVc5deii91__UNeDg_z9r4Fk98"
+          # keep only a NON-EMPTY JSON array — never let an empty/broken pull (e.g. a wipe day) replace good backups
+          snap () {
+            curl -sS -X POST "$API/rpc/$1" -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{}' -o "$2"
+            if python3 -c "import json,sys; d=json.load(open('$2')); sys.exit(0 if isinstance(d,list) and len(d)>0 else 1)"; then
+              echo "Backed up $(python3 -c "import json;print(len(json.load(open('$2'))))") -> $2"
+            else
+              echo "$2: empty/invalid — skipping (keeping existing)"; rm -f "$2"
+            fi
+          }
+          snap bt_public        "backups/bt_history_${DAY}.json"
+          snap bt_strats_public "backups/bt_strategies_${DAY}.json"
+          # keep only the 7 most-recent daily snapshots of each
+          ls -1 backups/bt_history_*.json    2>/dev/null | sort | head -n -7 | xargs -r rm -f
+          ls -1 backups/bt_strategies_*.json 2>/dev/null | sort | head -n -7 | xargs -r rm -f
+
+      - name: Commit (reset-and-replay on push conflict, like the other refresh jobs)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -d backups ] || exit 0
+          rm -rf /tmp/btb && mkdir -p /tmp/btb && cp backups/*.json /tmp/btb/ 2>/dev/null || true
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p backups
+            rm -f backups/bt_history_*.json
+            cp /tmp/btb/*.json backups/ 2>/dev/null || true
+            git add backups
+            if git diff --cached --quiet; then echo "No backup change"; exit 0; fi
+            git commit -m "Daily backtest-history backup $(TZ=Asia/Kolkata date +'%Y-%m-%d')"
+            if git push origin HEAD:main; then echo "Pushed on attempt #$attempt"; exit 0; fi
+            echo "Push #$attempt rejected; retrying"; sleep $(( attempt * 3 ))
+          done
+          echo "Failed to push after 5 attempts"; exit 1

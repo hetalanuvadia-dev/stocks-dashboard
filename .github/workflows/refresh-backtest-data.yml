@@ -1,0 +1,114 @@
+name: Daily backtest data refresh
+
+on:
+  schedule:
+    # 15:15 UTC = 20:45 IST, weekdays — after NSE publishes the day's bhavcopy
+    # (~19:00 IST). GitHub cron is best-effort; the updater self-heals (it
+    # appends every missing day since the file's `end`), so a skipped run is
+    # caught up by the next one.
+    - cron: "15 15 * * 1-5"
+  # Optional external trigger (cron-job.org), SEPARATE event type from the
+  # stock/MF/FII jobs: POST /repos/dhruvan246/stocks-dashboard/dispatches
+  # with {"event_type":"backtest-data-refresh"}
+  repository_dispatch:
+    types: [backtest-data-refresh]
+  workflow_dispatch: {}
+  # Bootstrap/self-test: also run when the updater itself changes
+  push:
+    paths:
+      - "scripts/update_sf_data.py"
+      - ".github/workflows/refresh-backtest-data.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-backtest-data
+  cancel-in-progress: false
+
+jobs:
+  refresh-backtest-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Refresh OFFICIAL split/bonus ratios first so the updater applies exact factors on any
+      # ex-date (a split/bonus that moves on its ex-date, or a small bonus, is mis-inferred from
+      # the price drop otherwise). Cheap (~9 NSE API calls); on failure the committed copy is used.
+      - name: Refresh official corporate-action ratios
+        run: python3 scripts/build_corp_actions.py || echo "corp-action refresh failed — using committed copy"
+
+      - name: Append missing trading days to sf_stock_data.bin
+        run: python3 scripts/update_sf_data.py
+
+      # The 80+ MB dataset is published as a RELEASE ASSET (replaced in place),
+      # NOT committed — committing it daily would grow the repo by ~2.5 GB/month.
+      # The backtest pages fetch the release URL first and fall back to the
+      # in-repo copy.
+      - name: Publish dataset as release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Seed the release on first run even with no new data, so the frontend's
+          # release-first load works immediately. On later runs, only re-upload when
+          # the updater actually appended a day (docs/.sf_updated present).
+          if gh release view data >/dev/null 2>&1; then
+            EXISTS=1
+          else
+            EXISTS=0
+            gh release create data --title "Backtest data (rolling)" \
+              --notes "Rolling daily survivorship-free dataset for the stock backtest. Replaced in place every trading day." \
+              --latest=false
+          fi
+          if [ -f docs/.sf_updated ] || [ "$EXISTS" = "0" ]; then
+            gh release upload data docs/sf_stock_data.bin --clobber
+            echo "Published sf_stock_data.bin (end=$(python3 -c "import json,gzip;print(json.loads(gzip.decompress(open('docs/sf_stock_data.bin','rb').read()))['end'])"))"
+          else
+            echo "No new data and release already seeded — nothing to publish"
+          fi
+
+      # The browser loads the dataset from the dedicated same-origin sf-data Pages repo (the release
+      # asset fails CORS in-browser). Split the >100MB file into 2 sub-100MB halves and FORCE-PUSH them
+      # there — a fresh single commit each day, so that repo never accumulates history/bloat.
+      - name: Force-push split data to sf-data Pages repo
+        if: ${{ hashFiles('docs/.sf_updated') != '' || github.event_name == 'workflow_dispatch' }}
+        env:
+          SF_DATA_TOKEN: ${{ secrets.SF_DATA_TOKEN }}
+        run: |
+          python3 scripts/split_sf_data.py
+          cd scripts/_sfsplit
+          git init -q -b main
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sf_stock_data_1.bin sf_stock_data_2.bin sf_meta.json
+          git commit -q -m "data $(TZ=Asia/Kolkata date +'%Y-%m-%d %H:%M IST')"
+          git push -q --force "https://x:${SF_DATA_TOKEN}@github.com/dhruvan246/sf-data.git" main
+          echo "force-pushed fresh split data to sf-data"
+
+      # Commit ONLY the tiny version marker (docs/sf_meta.json, ~20 bytes), and only when the
+      # updater actually appended a day (it rewrote sf_meta.json then). The browser keys its
+      # IndexedDB cache of the big bin on this `end`, so bumping it is what makes clients
+      # re-download; the 80 MB bin itself is never committed (stays a release asset).
+      - name: Commit version marker
+        if: ${{ hashFiles('docs/.sf_updated') != '' }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp docs/sf_meta.json /tmp/sf_meta.json     # preserve the updater's fresh marker across reset
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main && git reset --hard origin/main
+            cp /tmp/sf_meta.json docs/sf_meta.json
+            git add docs/sf_meta.json
+            if git diff --cached --quiet; then echo "marker unchanged"; exit 0; fi
+            git commit -m "Backtest data version marker $(TZ=Asia/Kolkata date +'%Y-%m-%d %H:%M IST')"
+            if git push origin HEAD:main; then echo "pushed marker (attempt #$attempt)"; exit 0; fi
+            sleep $(( attempt * 3 ))
+          done
+          echo "marker push failed after 5 attempts"; exit 1
